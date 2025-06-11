@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>يوزرات ديسكورد - متجر البرمجة</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar" style="justify-content:center;">
+        <div class="logo">
+            <i class="fas fa-code"></i>
+            <span>München Store</span>
+        </div>
+        <ul class="nav-links" style="margin:0 auto;">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">منتجاتنا <i class="fas fa-angle-down"></i></a>
+                <div class="dropdown-content">
+                    <a href="bots.html">بوتات ديسكورد</a>
+                    <a href="users.html" class="active">يوزرات ديسكورد</a>
+                    <a href="websites.html">برمجة مواقع شخصية</a>
+                </div>
+            </li>
+        </ul>
+        <div class="cart-fab" id="cart-fab" title="سلة المشتريات" style="position:static;box-shadow:0 2px 12px #5865f244;width:54px;height:54px;font-size:1.7rem;margin-right:0;">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count" id="cart-count" style="display:none;top:2px;left:2px;">0</span>
+        </div>
+    </nav>
+    <div class="main-content">
+        <h2 style="font-size:2.1rem;letter-spacing:1px;text-shadow:0 2px 8px #5865f244;">يوزرات ديسكورد <span style='color:#57f287;font-size:1.3rem;'>المميزة</span></h2>
+        <p style="text-align:center;max-width:600px;margin:0 auto 2rem auto;font-size:1.1rem;color:#b9bbbe;">احصل على يوزر ديسكورد مميز أو أضفه إلى سلة مشترياتك وادفع بسهولة عبر PayPal.</p>
+        <div class="users-list" id="users-list"></div>
+    </div>
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <span>سلة المشتريات</span>
+            <div class="cart-close-buttons">
+                <button class="cart-close" id="cart-close" title="إغلاق السلة">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total" id="cart-total"></div>
+            <button class="cart-pay-btn" id="cart-pay-btn">
+                <i class="fab fa-paypal"></i> الدفع عبر PayPal
+            </button>
+        </div>
+    </div>
+    <footer style="background:#181c20;color:#b9bbbe;padding:2rem 1rem 1rem 1rem;text-align:center;border-top:1.5px solid #36393f;margin-top:2rem;">
+        <div style="font-size:1.15rem;margin-bottom:0.7rem;color:#fff;font-weight:bold;">München Store &copy; 2025</div>
+        <div style="margin-bottom:0.7rem;">
+            <a href="privacy.html" style="color:#57f287;text-decoration:underline;font-size:1.05rem;">سياسة الخصوصية</a> |
+            <a href="mailto:info@munchenstore.com" style="color:#5865f2;text-decoration:underline;font-size:1.05rem;">تواصل معنا</a>
+        </div>
+        <div id="privacy" style="max-width:700px;margin:1.2rem auto 0 auto;font-size:0.98rem;background:#23272a;padding:1.1rem 0.7rem;border-radius:10px;">
+            <b style="color:#fff;">سياسة الخصوصية:</b><br>
+            نحن نحترم خصوصيتك ولا نشارك بياناتك مع أي طرف ثالث. جميع عمليات الدفع مؤمنة عبر PayPal، ولا يتم تخزين أي بيانات حساسة على الموقع.
+        </div>
+    </footer>
+    <script src="orders-database.js"></script>
+    <script src="users.js"></script>
+    <script src="userscript.js"></script>
+    <script src="cart.js"></script>
+    <script src="support-chat.js"></script>
+    <script>
+      window.addToCart = function(item) {
+        if (window.cartAdd) window.cartAdd(item);
+      }
+    </script>
+</body>
+</html> 

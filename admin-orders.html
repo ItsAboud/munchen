@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الطلبات - München Store</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 1rem auto;
+            padding: 1rem;
+            background: #23272a;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-height: calc(100vh - 2rem);
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .admin-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.8rem;
+        }
+
+        .admin-header p {
+            margin: 0.5rem 0;
+            opacity: 0.9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: #2c2f33;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid #36393f;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(87, 242, 135, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #57f287;
+            margin-bottom: 0.3rem;
+            word-break: break-all;
+        }
+
+        .stat-label {
+            color: #b9bbbe;
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.7rem 1rem;
+            border: 2px solid #36393f;
+            border-radius: 8px;
+            background: #2c2f33;
+            color: #fff;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #57f287;
+            box-shadow: 0 0 0 3px rgba(87, 242, 135, 0.1);
+        }
+
+        .btn {
+            padding: 0.7rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(87, 242, 135, 0.3);
+        }
+
+        .btn-secondary {
+            background: #36393f;
+            color: #b9bbbe;
+        }
+
+        .btn-secondary:hover {
+            background: #40444b;
+            color: #fff;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            background: #2c2f33;
+        }
+
+        .orders-table {
+            width: 100%;
+            min-width: 800px;
+            border-collapse: collapse;
+            background: #2c2f33;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 0.8rem;
+            text-align: right;
+            border-bottom: 1px solid #36393f;
+            vertical-align: middle;
+        }
+
+        .orders-table th {
+            background: #36393f;
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .orders-table td {
+            color: #b9bbbe;
+            font-size: 0.85rem;
+        }
+
+        .orders-table tr:hover {
+            background: rgba(87, 242, 135, 0.05);
+        }
+        
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+        
+        .status-processing {
+            background: rgba(88, 101, 242, 0.2);
+            color: #5865f2;
+        }
+        
+        .status-completed {
+            background: rgba(87, 242, 135, 0.2);
+            color: #57f287;
+        }
+        
+        .status-cancelled {
+            background: rgba(255, 85, 85, 0.2);
+            color: #ff5555;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.7rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-btn.edit {
+            background: #5865f2;
+            color: #fff;
+        }
+
+        .action-btn.complete {
+            background: #57f287;
+            color: #000;
+        }
+
+        .action-btn.cancel {
+            background: #ff5555;
+            color: #fff;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #b9bbbe;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #36393f;
+            margin-bottom: 1rem;
+        }
+        
+        /* تحسينات للتابلت */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .admin-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .controls {
+                gap: 0.6rem;
+            }
+
+            .btn {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .orders-table {
+                min-width: 700px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 0.7rem 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* تحسينات للهواتف الكبيرة */
+        @media (max-width: 768px) and (min-width: 481px) {
+            .admin-container {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+
+            .admin-header {
+                padding: 1rem;
+            }
+
+            .admin-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+            }
+
+            .stat-card {
+                padding: 0.8rem;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .search-box {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 0.8rem;
+            }
+
+            .orders-table {
+                min-width: 600px;
+                font-size: 0.8rem;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 0.6rem 0.4rem;
+            }
+
+            .action-btn {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.5rem;
+                min-width: 50px;
+            }
+        }
+
+        /* تحسينات للهواتف الصغيرة */
+        @media (max-width: 480px) {
+            body {
+                font-size: 14px;
+            }
+
+            .admin-container {
+                margin: 0;
+                padding: 0.8rem;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .admin-header {
+                padding: 1rem 0.8rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+            }
+
+            .admin-header h1 {
+                font-size: 1.3rem;
+            }
+
+            .admin-header p {
+                font-size: 0.9rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.6rem;
+            }
+
+            .stat-card {
+                padding: 0.6rem;
+            }
+
+            .stat-value {
+                font-size: 1.1rem;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 0.6rem;
+                margin-bottom: 1rem;
+            }
+
+            .search-box {
+                width: 100%;
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .table-container {
+                margin: 0 -0.8rem;
+                border-radius: 0;
+            }
+
+            .orders-table {
+                min-width: 500px;
+                font-size: 0.75rem;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 0.5rem 0.3rem;
+            }
+
+            .orders-table th {
+                font-size: 0.7rem;
+            }
+
+            .order-actions {
+                flex-direction: column;
+                gap: 0.2rem;
+            }
+
+            .action-btn {
+                font-size: 0.65rem;
+                padding: 0.4rem;
+                min-width: auto;
+                width: 100%;
+            }
+
+            .empty-state {
+                padding: 2rem 1rem;
+            }
+
+            .empty-state i {
+                font-size: 3rem;
+            }
+
+            .empty-state h3 {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* تحسينات إضافية للشاشات الصغيرة جداً */
+        @media (max-width: 360px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-table {
+                min-width: 400px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 0.4rem 0.2rem;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* نموذج تسجيل الدخول */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #23272a 0%, #1e2124 100%);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-container {
+            background: linear-gradient(180deg, #2c2f33 0%, #23272a 100%);
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 32px rgba(88, 101, 242, 0.2);
+            border: 2px solid rgba(88, 101, 242, 0.3);
+            animation: loginSlideIn 0.5s ease-out;
+        }
+
+        @keyframes loginSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: #fff;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .login-header p {
+            color: #b9bbbe;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .login-icon {
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem auto;
+            box-shadow: 0 8px 32px rgba(88, 101, 242, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid #36393f;
+            border-radius: 12px;
+            background: #23272a;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #5865f2;
+            box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.1);
+            background: #2c2f33;
+        }
+
+        .form-group input::placeholder {
+            color: #72767d;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(88, 101, 242, 0.4);
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+            transition: transform 0.1s;
+        }
+
+        .error-message {
+            background: rgba(255, 85, 85, 0.1);
+            border: 1px solid #ff5555;
+            color: #ff5555;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+
+        .security-note {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid #ffa500;
+            color: #ffa500;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* تأثير الاهتزاز عند الخطأ */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* تحسينات للهواتف */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+                border-radius: 16px;
+            }
+
+            .login-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
+            }
+
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-group input {
+                padding: 0.9rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            .login-btn {
+                padding: 0.9rem 1.2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- نموذج تسجيل الدخول -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>تسجيل الدخول</h1>
+                <p>لوحة إدارة الطلبات - München Store</p>
+            </div>
+
+            <form id="login-form">
+                <div class="error-message" id="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    اسم المستخدم أو كلمة المرور غير صحيحة
+                </div>
+
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> اسم المستخدم
+                    </label>
+                    <input type="text" id="username" name="username" placeholder="أدخل اسم المستخدم" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> كلمة المرور
+                    </label>
+                    <input type="password" id="password" name="password" placeholder="أدخل كلمة المرور" required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> دخول
+                </button>
+
+                <div class="security-note">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>بيانات الدخول الافتراضية:</strong><br>
+                    اسم المستخدم: <code>admin</code><br>
+                    كلمة المرور: <code>admin123</code>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-container" id="admin-container" style="display: none;">
+        <div class="admin-header">
+            <h1><i class="fas fa-chart-bar"></i> لوحة إدارة الطلبات</h1>
+            <p>إدارة ومتابعة جميع طلبات العملاء</p>
+            <div style="background: rgba(255, 165, 0, 0.1); border: 1px solid #ffa500; border-radius: 8px; padding: 1rem; margin-top: 1rem; font-size: 0.85rem; line-height: 1.5;">
+                <i class="fas fa-info-circle" style="color: #ffa500; margin-left: 0.5rem;"></i>
+                <strong>ملاحظة مهمة:</strong> هذا نظام تجريبي يحفظ البيانات محلياً في المتصفح.
+                <br><small>• الطلبات تظهر فقط في نفس المتصفح الذي تم إنشاؤها فيه</small>
+                <br><small>• للنظام الحقيقي تحتاج خادم وقاعدة بيانات لاستقبال إشعارات PayPal</small>
+            </div>
+        </div>
+        
+        <div class="stats-grid" id="stats-grid">
+            <!-- سيتم ملؤها بـ JavaScript -->
+        </div>
+        
+        <div class="controls">
+            <input type="text" class="search-box" id="search-box" placeholder="البحث في الطلبات...">
+            <button class="btn btn-primary" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> تحديث
+            </button>
+            <button class="btn btn-secondary" onclick="exportData()">
+                <i class="fas fa-download"></i> تصدير
+            </button>
+            <button class="btn btn-secondary" onclick="showImportModal()">
+                <i class="fas fa-upload"></i> استيراد
+            </button>
+            <button class="btn btn-secondary" onclick="resetDatabase()" style="background: #ff5555;">
+                <i class="fas fa-trash"></i> إعادة تعيين
+            </button>
+        </div>
+        
+        <div id="orders-container">
+            <!-- سيتم ملؤها بـ JavaScript -->
+        </div>
+    </div>
+    
+    <script src="orders-database.js"></script>
+    <script>
+        let allOrders = [];
+        let filteredOrders = [];
+        let isLoggedIn = false;
+
+        // بيانات تسجيل الدخول (في التطبيق الحقيقي يجب أن تكون مشفرة ومحفوظة بأمان)
+        const adminCredentials = {
+            username: 'admin',
+            password: 'admin123'
+        };
+
+        // تحميل البيانات عند بدء الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            setupLoginForm();
+        });
+
+        function checkLoginStatus() {
+            // فحص إذا كان المستخدم مسجل دخول مسبقاً (جلسة محفوظة)
+            const savedLogin = localStorage.getItem('admin_logged_in');
+            const loginTime = localStorage.getItem('admin_login_time');
+
+            // انتهاء صلاحية الجلسة بعد 24 ساعة
+            const sessionExpiry = 24 * 60 * 60 * 1000; // 24 ساعة بالميلي ثانية
+
+            if (savedLogin === 'true' && loginTime) {
+                const currentTime = new Date().getTime();
+                const timeDiff = currentTime - parseInt(loginTime);
+
+                if (timeDiff < sessionExpiry) {
+                    // الجلسة صالحة
+                    loginSuccess();
+                    return;
+                }
+            }
+
+            // إظهار نموذج تسجيل الدخول
+            showLoginForm();
+        }
+
+        function setupLoginForm() {
+            const loginForm = document.getElementById('login-form');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('error-message');
+
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value;
+
+                if (validateCredentials(username, password)) {
+                    // حفظ حالة تسجيل الدخول
+                    localStorage.setItem('admin_logged_in', 'true');
+                    localStorage.setItem('admin_login_time', new Date().getTime().toString());
+
+                    loginSuccess();
+                } else {
+                    showError();
+                }
+            });
+
+            // إخفاء رسالة الخطأ عند الكتابة
+            [usernameInput, passwordInput].forEach(input => {
+                input.addEventListener('input', function() {
+                    hideError();
+                });
+            });
+        }
+
+        function validateCredentials(username, password) {
+            return username === adminCredentials.username && password === adminCredentials.password;
+        }
+
+        function showLoginForm() {
+            document.getElementById('login-overlay').style.display = 'flex';
+            document.getElementById('admin-container').style.display = 'none';
+            document.getElementById('username').focus();
+        }
+
+        function loginSuccess() {
+            isLoggedIn = true;
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('admin-container').style.display = 'block';
+
+            // تحميل البيانات
+            loadData();
+            setupSearch();
+
+            // إضافة زر تسجيل الخروج
+            addLogoutButton();
+        }
+
+        function showError() {
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.style.display = 'block';
+
+            // اهتزاز النموذج
+            const loginContainer = document.querySelector('.login-container');
+            loginContainer.style.animation = 'shake 0.5s ease-in-out';
+
+            setTimeout(() => {
+                loginContainer.style.animation = '';
+            }, 500);
+
+            // تفريغ كلمة المرور
+            document.getElementById('password').value = '';
+            document.getElementById('password').focus();
+        }
+
+        function hideError() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function addLogoutButton() {
+            const adminHeader = document.querySelector('.admin-header');
+
+            // التحقق من عدم وجود زر تسجيل الخروج مسبقاً
+            if (!document.getElementById('logout-btn')) {
+                const logoutBtn = document.createElement('button');
+                logoutBtn.id = 'logout-btn';
+                logoutBtn.className = 'btn btn-secondary';
+                logoutBtn.style.cssText = `
+                    position: absolute;
+                    top: 1rem;
+                    left: 1rem;
+                    background: rgba(255, 85, 85, 0.2);
+                    border: 1px solid #ff5555;
+                    color: #ff5555;
+                    padding: 0.5rem 1rem;
+                    font-size: 0.9rem;
+                `;
+                logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> خروج';
+                logoutBtn.onclick = logout;
+
+                adminHeader.style.position = 'relative';
+                adminHeader.appendChild(logoutBtn);
+            }
+        }
+
+        function logout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                localStorage.removeItem('admin_logged_in');
+                localStorage.removeItem('admin_login_time');
+                isLoggedIn = false;
+
+                // إعادة تعيين النموذج
+                document.getElementById('login-form').reset();
+                hideError();
+
+                showLoginForm();
+            }
+        }
+        
+        function loadData() {
+            const stats = window.ordersDB.getStats();
+            allOrders = window.ordersDB.getAllOrders();
+            filteredOrders = [...allOrders];
+            
+            renderStats(stats);
+            renderOrders(filteredOrders);
+        }
+        
+        function renderStats(stats) {
+            const statsGrid = document.getElementById('stats-grid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.totalOrders}</div>
+                    <div class="stat-label">إجمالي الطلبات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$${stats.totalRevenue}</div>
+                    <div class="stat-label">إجمالي المبيعات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.pendingOrders}</div>
+                    <div class="stat-label">طلبات معلقة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.completedOrders}</div>
+                    <div class="stat-label">طلبات مكتملة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.totalCustomers}</div>
+                    <div class="stat-label">إجمالي العملاء</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$${stats.averageOrderValue}</div>
+                    <div class="stat-label">متوسط قيمة الطلب</div>
+                </div>
+            `;
+        }
+        
+        function renderOrders(orders) {
+            const container = document.getElementById('orders-container');
+            
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>لا توجد طلبات</h3>
+                        <p>لم يتم العثور على أي طلبات بعد</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const table = `
+                <div class="table-container">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>العميل</th>
+                                <th>المنتجات</th>
+                                <th>المبلغ</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${orders.map(order => `
+                                <tr>
+                                    <td><strong>#${order.id}</strong></td>
+                                    <td>
+                                        <div style="font-weight: bold; margin-bottom: 0.2rem;">${order.customerInfo.name}</div>
+                                        <div style="font-size: 0.75rem; color: #888; word-break: break-all;">${order.customerInfo.email}</div>
+                                    </td>
+                                    <td>
+                                        <div style="max-width: 150px;">
+                                            ${order.items.map(item => `<div style="margin-bottom: 0.2rem; font-size: 0.8rem;">${item.title}</div>`).join('')}
+                                        </div>
+                                    </td>
+                                    <td><strong style="color: #57f287;">$${order.total}</strong></td>
+                                    <td>
+                                        <span class="status-badge status-${order.status}">
+                                            ${getStatusText(order.status)}
+                                        </span>
+                                    </td>
+                                    <td style="font-size: 0.8rem;">${new Date(order.orderDate).toLocaleDateString('ar-SA')}</td>
+                                    <td>
+                                        <div class="order-actions">
+                                            ${order.status === 'pending' ? `
+                                                <button class="action-btn complete" onclick="updateOrderStatus(${order.id}, 'completed')" title="إكمال الطلب">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="action-btn cancel" onclick="updateOrderStatus(${order.id}, 'cancelled')" title="إلغاء الطلب">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            ` : ''}
+                                            <button class="action-btn edit" onclick="viewOrderDetails(${order.id})" title="عرض التفاصيل">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = table;
+        }
+        
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'معلق',
+                'processing': 'قيد المعالجة',
+                'completed': 'مكتمل',
+                'cancelled': 'ملغي'
+            };
+            return statusMap[status] || status;
+        }
+        
+        function setupSearch() {
+            const searchBox = document.getElementById('search-box');
+            searchBox.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (query === '') {
+                    filteredOrders = [...allOrders];
+                } else {
+                    filteredOrders = window.ordersDB.searchOrders(query);
+                }
+                renderOrders(filteredOrders);
+            });
+        }
+        
+        function updateOrderStatus(orderId, newStatus) {
+            if (!isLoggedIn) {
+                alert('يجب تسجيل الدخول أولاً!');
+                return;
+            }
+
+            if (confirm(`هل أنت متأكد من تغيير حالة الطلب إلى "${getStatusText(newStatus)}"؟`)) {
+                window.ordersDB.updateOrderStatus(orderId, newStatus);
+                loadData();
+                alert('تم تحديث حالة الطلب بنجاح!');
+            }
+        }
+        
+        function viewOrderDetails(orderId) {
+            const order = window.ordersDB.getOrderById(orderId);
+            if (order) {
+                // إنشاء نافذة تفاصيل أكثر جمالاً
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                    background: rgba(0,0,0,0.8); z-index: 10000; display: flex;
+                    align-items: center; justify-content: center; padding: 1rem;
+                `;
+
+                modal.innerHTML = `
+                    <div style="background: #23272a; border-radius: 16px; padding: 2rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; border: 2px solid #57f287;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #36393f; padding-bottom: 1rem;">
+                            <h3 style="color: #57f287; margin: 0; font-size: 1.3rem;">
+                                <i class="fas fa-receipt"></i> تفاصيل الطلب #${order.id}
+                            </h3>
+                            <button onclick="this.closest('div').parentElement.remove()" style="background: #ff5555; border: none; color: white; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div style="color: #fff; line-height: 1.6;">
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                <h4 style="color: #5865f2; margin: 0 0 0.5rem 0;"><i class="fas fa-user"></i> معلومات العميل</h4>
+                                <div><strong>الاسم:</strong> ${order.customerInfo.name}</div>
+                                <div><strong>البريد:</strong> ${order.customerInfo.email}</div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                <h4 style="color: #5865f2; margin: 0 0 0.5rem 0;"><i class="fas fa-shopping-bag"></i> المنتجات</h4>
+                                ${order.items.map(item => `
+                                    <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #36393f;">
+                                        <span>${item.title}</span>
+                                        <span style="color: #57f287; font-weight: bold;">$${item.price}</span>
+                                    </div>
+                                `).join('')}
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; font-weight: bold; font-size: 1.1rem; color: #57f287; border-top: 2px solid #57f287; margin-top: 0.5rem;">
+                                    <span>الإجمالي:</span>
+                                    <span>$${order.total}</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                <h4 style="color: #5865f2; margin: 0 0 0.5rem 0;"><i class="fas fa-info-circle"></i> تفاصيل الطلب</h4>
+                                <div><strong>الحالة:</strong> <span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></div>
+                                <div><strong>تاريخ الطلب:</strong> ${new Date(order.orderDate).toLocaleString('ar-SA')}</div>
+                                <div><strong>طريقة الدفع:</strong> PayPal</div>
+                                ${order.notes ? `<div><strong>الملاحظات:</strong> ${order.notes}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                // إغلاق عند الضغط خارج النافذة
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            }
+        }
+        
+        function refreshData() {
+            loadData();
+            alert('تم تحديث البيانات!');
+        }
+        
+        function exportData() {
+            window.ordersDB.exportData();
+        }
+        
+        function showImportModal() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (window.ordersDB.importData(e.target.result)) {
+                            alert('تم استيراد البيانات بنجاح!');
+                            loadData();
+                        } else {
+                            alert('خطأ في استيراد البيانات!');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+        
+        function resetDatabase() {
+            if (!isLoggedIn) {
+                alert('يجب تسجيل الدخول أولاً!');
+                return;
+            }
+
+            if (confirm('هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+                if (confirm('تأكيد أخير: سيتم حذف جميع الطلبات والعملاء!')) {
+                    window.ordersDB.resetDatabase();
+                    loadData();
+                    alert('تم إعادة تعيين قاعدة البيانات!');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
