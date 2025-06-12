@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة تذاكر الدعم الفني - München Store</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* نموذج تسجيل الدخول */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #23272a 0%, #1e2124 100%);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-container {
+            background: linear-gradient(180deg, #2c2f33 0%, #23272a 100%);
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 8px 32px rgba(88, 101, 242, 0.2);
+            border: 2px solid rgba(88, 101, 242, 0.3);
+            animation: loginSlideIn 0.5s ease-out;
+        }
+
+        @keyframes loginSlideIn {
+            from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: #fff;
+            margin: 0 0 0.5rem 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .login-header p {
+            color: #b9bbbe;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .login-icon {
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem auto;
+            box-shadow: 0 8px 32px rgba(88, 101, 242, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid #36393f;
+            border-radius: 12px;
+            background: #23272a;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #5865f2;
+            box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.1);
+            background: #2c2f33;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.3);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(88, 101, 242, 0.4);
+        }
+
+        .error-message {
+            background: rgba(255, 85, 85, 0.1);
+            border: 1px solid #ff5555;
+            color: #ff5555;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+
+        /* تأثير الاهتزاز عند الخطأ */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* الحاوي الرئيسي */
+        .admin-container {
+            max-width: 1400px;
+            margin: 1rem auto;
+            padding: 1rem;
+            background: #23272a;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-height: calc(100vh - 2rem);
+            display: none;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .admin-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.8rem;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 85, 85, 0.2);
+            border: 1px solid #ff5555;
+            color: #ff5555;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 85, 85, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #2c2f33;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #36393f;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(87, 242, 135, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #57f287;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #b9bbbe;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 0.8rem 1rem;
+            border: 2px solid #36393f;
+            border-radius: 8px;
+            background: #2c2f33;
+            color: #fff;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #57f287;
+            box-shadow: 0 0 0 3px rgba(87, 242, 135, 0.1);
+        }
+
+        .filter-select {
+            padding: 0.8rem 1rem;
+            border: 2px solid #36393f;
+            border-radius: 8px;
+            background: #2c2f33;
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(87, 242, 135, 0.3);
+        }
+
+        .tickets-container {
+            background: #2c2f33;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #36393f;
+        }
+
+        .ticket-item {
+            background: #23272a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #36393f;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ticket-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(87, 242, 135, 0.1);
+            border-color: rgba(87, 242, 135, 0.3);
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .ticket-id {
+            color: #5865f2;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .ticket-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-open { background: rgba(87, 242, 135, 0.2); color: #57f287; }
+        .status-pending { background: rgba(255, 165, 0, 0.2); color: #ffa500; }
+        .status-closed { background: rgba(255, 85, 85, 0.2); color: #ff5555; }
+
+        .ticket-title {
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .ticket-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #b9bbbe;
+            margin-bottom: 1rem;
+        }
+
+        .ticket-description {
+            color: #b9bbbe;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ticket-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .action-btn.reply {
+            background: #5865f2;
+            color: #fff;
+        }
+
+        .action-btn.close {
+            background: #ff5555;
+            color: #fff;
+        }
+
+        .action-btn.reopen {
+            background: #57f287;
+            color: #000;
+        }
+
+        .action-btn.delete {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .action-btn.delete:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .priority-high { color: #ff5555; }
+        .priority-medium { color: #ffa500; }
+        .priority-low { color: #57f287; }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #b9bbbe;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #36393f;
+            margin-bottom: 1rem;
+        }
+
+        /* تحسينات للهواتف */
+        @media (max-width: 768px) {
+            .admin-container {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .search-box {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .ticket-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .ticket-meta {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+
+            .ticket-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- نموذج تسجيل الدخول -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h1>إدارة الدعم الفني</h1>
+                <p>تسجيل دخول المشرفين</p>
+            </div>
+            
+            <form id="login-form">
+                <div class="error-message" id="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    اسم المستخدم أو كلمة المرور غير صحيحة
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> اسم المستخدم
+                    </label>
+                    <input type="text" id="username" name="username" placeholder="أدخل اسم المستخدم" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> كلمة المرور
+                    </label>
+                    <input type="password" id="password" name="password" placeholder="أدخل كلمة المرور" required>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> دخول
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- لوحة الإدارة -->
+    <div class="admin-container" id="admin-container">
+        <div class="admin-header">
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> خروج
+            </button>
+            <h1><i class="fas fa-headset"></i> إدارة تذاكر الدعم الفني</h1>
+            <p>إدارة ومتابعة جميع تذاكر العملاء</p>
+        </div>
+        
+        <div class="stats-grid" id="stats-grid">
+            <!-- سيتم ملؤها بـ JavaScript -->
+        </div>
+        
+        <div class="controls">
+            <input type="text" class="search-box" id="search-box" placeholder="البحث في التذاكر...">
+            <select class="filter-select" id="status-filter">
+                <option value="">جميع الحالات</option>
+                <option value="open">مفتوحة</option>
+                <option value="pending">قيد المراجعة</option>
+                <option value="closed">مغلقة</option>
+            </select>
+
+            <button class="btn btn-primary" onclick="refreshTickets()">
+                <i class="fas fa-sync-alt"></i> تحديث
+            </button>
+            <button class="btn" onclick="clearAllTickets()" style="background: #ff5555; color: #fff;">
+                <i class="fas fa-trash"></i> مسح جميع التذاكر
+            </button>
+        </div>
+        
+        <div class="tickets-container">
+            <div id="tickets-list">
+                <!-- سيتم ملؤها بـ JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <footer style="background:#181c20;color:#b9bbbe;padding:2rem 1rem 1rem 1rem;text-align:center;border-top:1.5px solid #36393f;margin-top:2rem;">
+        <div style="font-size:1.15rem;margin-bottom:0.7rem;color:#fff;font-weight:bold;">München Store &copy; 2025</div>
+        <div style="margin-bottom:0.7rem;">
+            <a href="privacy.html" style="color:#57f287;text-decoration:underline;font-size:1.05rem;">سياسة الخصوصية</a> |
+            <a href="support-tickets.html" style="color:#5865f2;text-decoration:underline;font-size:1.05rem;">الدعم الفني</a> |
+            <a href="mailto:info@munchenstore.com" style="color:#5865f2;text-decoration:underline;font-size:1.05rem;">تواصل معنا</a>
+        </div>
+        <div id="privacy" style="max-width:700px;margin:1.2rem auto 0 auto;font-size:0.98rem;background:#23272a;padding:1.1rem 0.7rem;border-radius:10px;">
+            <b style="color:#fff;">سياسة الخصوصية:</b><br>
+            نحن نحترم خصوصيتك ولا نشارك بياناتك مع أي طرف ثالث. جميع عمليات الدفع مؤمنة عبر PayPal، ولا يتم تخزين أي بيانات حساسة على الموقع.
+        </div>
+    </footer>
+
+    <script src="support-tickets-db.js"></script>
+    <script>
+        // نظام إدارة تذاكر الدعم الفني
+        class SupportAdminSystem {
+            constructor() {
+                this.isLoggedIn = false;
+                this.db = window.supportTicketsDB;
+                this.tickets = [];
+                this.filteredTickets = [];
+                this.adminCredentials = {
+                    username: 'support',
+                    password: 'support123'
+                };
+                this.init();
+            }
+
+            init() {
+                this.checkLoginStatus();
+                this.setupLoginForm();
+                this.setupFilters();
+            }
+
+            checkLoginStatus() {
+                const savedLogin = localStorage.getItem('support_admin_logged_in');
+                const loginTime = localStorage.getItem('support_admin_login_time');
+                const sessionExpiry = 24 * 60 * 60 * 1000; // 24 ساعة
+
+                if (savedLogin === 'true' && loginTime) {
+                    const currentTime = new Date().getTime();
+                    const timeDiff = currentTime - parseInt(loginTime);
+
+                    if (timeDiff < sessionExpiry) {
+                        this.loginSuccess();
+                        return;
+                    }
+                }
+
+                this.showLoginForm();
+            }
+
+            setupLoginForm() {
+                const loginForm = document.getElementById('login-form');
+                const usernameInput = document.getElementById('username');
+                const passwordInput = document.getElementById('password');
+
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const username = usernameInput.value.trim();
+                    const password = passwordInput.value;
+
+                    if (this.validateCredentials(username, password)) {
+                        localStorage.setItem('support_admin_logged_in', 'true');
+                        localStorage.setItem('support_admin_login_time', new Date().getTime().toString());
+                        this.loginSuccess();
+                    } else {
+                        this.showError();
+                    }
+                });
+
+                [usernameInput, passwordInput].forEach(input => {
+                    input.addEventListener('input', () => this.hideError());
+                });
+            }
+
+            validateCredentials(username, password) {
+                return username === this.adminCredentials.username && password === this.adminCredentials.password;
+            }
+
+            showLoginForm() {
+                document.getElementById('login-overlay').style.display = 'flex';
+                document.getElementById('admin-container').style.display = 'none';
+                document.getElementById('username').focus();
+            }
+
+            loginSuccess() {
+                this.isLoggedIn = true;
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('admin-container').style.display = 'block';
+                this.loadTickets();
+                this.renderStats();
+                this.renderTickets();
+
+                // تحديث تلقائي كل 30 ثانية
+                this.startAutoRefresh();
+            }
+
+            startAutoRefresh() {
+                setInterval(() => {
+                    if (this.isLoggedIn) {
+                        this.loadTickets();
+                        this.renderStats();
+                        this.renderTickets();
+                    }
+                }, 30000); // 30 ثانية
+            }
+
+            showError() {
+                const errorMessage = document.getElementById('error-message');
+                errorMessage.style.display = 'block';
+
+                const loginContainer = document.querySelector('.login-container');
+                loginContainer.style.animation = 'shake 0.5s ease-in-out';
+
+                setTimeout(() => {
+                    loginContainer.style.animation = '';
+                }, 500);
+
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+
+            hideError() {
+                document.getElementById('error-message').style.display = 'none';
+            }
+
+            loadTickets() {
+                try {
+                    this.tickets = this.db.getTickets();
+                    this.filteredTickets = [...this.tickets];
+                } catch (error) {
+                    console.error('خطأ في تحميل التذاكر:', error);
+                    this.tickets = [];
+                    this.filteredTickets = [];
+                }
+            }
+
+            renderStats() {
+                const stats = this.calculateStats();
+                const statsGrid = document.getElementById('stats-grid');
+
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.total}</div>
+                        <div class="stat-label">إجمالي التذاكر</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.open}</div>
+                        <div class="stat-label">تذاكر مفتوحة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.pending}</div>
+                        <div class="stat-label">قيد المراجعة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.closed}</div>
+                        <div class="stat-label">تذاكر مغلقة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.today}</div>
+                        <div class="stat-label">تذاكر اليوم</div>
+                    </div>
+                `;
+            }
+
+            calculateStats() {
+                const today = new Date().toDateString();
+                return {
+                    total: this.tickets.length,
+                    open: this.tickets.filter(t => t.status === 'open').length,
+                    pending: this.tickets.filter(t => t.status === 'pending').length,
+                    closed: this.tickets.filter(t => t.status === 'closed').length,
+                    today: this.tickets.filter(t => {
+                        const ticketDate = new Date(t.createdAt).toDateString();
+                        return today === ticketDate;
+                    }).length
+                };
+            }
+
+            renderTickets() {
+                const ticketsList = document.getElementById('tickets-list');
+
+                if (this.filteredTickets.length === 0) {
+                    ticketsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>لا توجد تذاكر</h3>
+                            <p>لا توجد تذاكر تطابق المعايير المحددة</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // ترتيب التذاكر حسب التاريخ (الأحدث أولاً)
+                const sortedTickets = [...this.filteredTickets].sort((a, b) =>
+                    new Date(b.createdAt) - new Date(a.createdAt)
+                );
+
+                ticketsList.innerHTML = sortedTickets.map(ticket => `
+                    <div class="ticket-item" onclick="adminSystem.viewTicketDetails('${ticket.id}')">
+                        <div class="ticket-header">
+                            <div class="ticket-id">#${ticket.id}</div>
+                            <div class="ticket-status status-${ticket.status}">
+                                ${this.getStatusText(ticket.status)}
+                            </div>
+                        </div>
+                        <div class="ticket-title">${ticket.subject}</div>
+                        <div class="ticket-meta">
+                            <span><i class="fas fa-user"></i> ${ticket.customerName}</span>
+                            <span><i class="fas fa-envelope"></i> ${ticket.customerEmail}</span>
+                            <span><i class="fas fa-calendar"></i> ${this.formatDate(ticket.createdAt)}</span>
+                        </div>
+                        <div class="ticket-description">${ticket.description}</div>
+                        <div class="ticket-actions">
+                            ${ticket.status !== 'closed' ? `
+                                <button class="action-btn reply" onclick="event.stopPropagation(); adminSystem.replyToTicket('${ticket.id}')">
+                                    <i class="fas fa-reply"></i> رد
+                                </button>
+                                <button class="action-btn close" onclick="event.stopPropagation(); adminSystem.closeTicket('${ticket.id}')">
+                                    <i class="fas fa-times"></i> إغلاق
+                                </button>
+                            ` : `
+                                <button class="action-btn reopen" onclick="event.stopPropagation(); adminSystem.reopenTicket('${ticket.id}')">
+                                    <i class="fas fa-undo"></i> إعادة فتح
+                                </button>
+                            `}
+                            <button class="action-btn delete" onclick="event.stopPropagation(); adminSystem.deleteTicket('${ticket.id}')">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            setupFilters() {
+                const searchBox = document.getElementById('search-box');
+                const statusFilter = document.getElementById('status-filter');
+
+                [searchBox, statusFilter].forEach(element => {
+                    element.addEventListener('input', () => this.applyFilters());
+                });
+            }
+
+            applyFilters() {
+                const searchTerm = document.getElementById('search-box').value.toLowerCase();
+                const statusFilter = document.getElementById('status-filter').value;
+
+                this.filteredTickets = this.tickets.filter(ticket => {
+                    const matchesSearch = !searchTerm ||
+                        ticket.subject.toLowerCase().includes(searchTerm) ||
+                        ticket.customerName.toLowerCase().includes(searchTerm) ||
+                        ticket.customerEmail.toLowerCase().includes(searchTerm) ||
+                        ticket.description.toLowerCase().includes(searchTerm);
+
+                    const matchesStatus = !statusFilter || ticket.status === statusFilter;
+
+                    return matchesSearch && matchesStatus;
+                });
+
+                this.renderTickets();
+            }
+
+            getStatusText(status) {
+                const statusMap = {
+                    'open': 'مفتوحة',
+                    'pending': 'قيد المراجعة',
+                    'closed': 'مغلقة'
+                };
+                return statusMap[status] || status;
+            }
+
+            getPriorityText(priority) {
+                const priorityMap = {
+                    'low': 'منخفضة',
+                    'medium': 'متوسطة',
+                    'high': 'عالية'
+                };
+                return priorityMap[priority] || priority;
+            }
+
+            getCategoryText(category) {
+                const categoryMap = {
+                    'technical': 'مشكلة تقنية',
+                    'billing': 'الفواتير والدفع',
+                    'product': 'استفسار عن المنتج',
+                    'account': 'مشكلة في الحساب',
+                    'other': 'أخرى'
+                };
+                return categoryMap[category] || category;
+            }
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('ar-SA', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            viewTicketDetails(ticketId) {
+                const ticket = this.tickets.find(t => t.id === ticketId);
+                if (!ticket) return;
+
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                    background: rgba(0,0,0,0.8); z-index: 10000; display: flex;
+                    align-items: center; justify-content: center; padding: 1rem;
+                `;
+
+                modal.innerHTML = `
+                    <div style="background: #23272a; border-radius: 16px; padding: 2rem; max-width: 700px; width: 100%; max-height: 80vh; overflow-y: auto; border: 2px solid #5865f2;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #36393f; padding-bottom: 1rem;">
+                            <h3 style="color: #5865f2; margin: 0; font-size: 1.3rem;">
+                                <i class="fas fa-ticket-alt"></i> تذكرة #${ticket.id}
+                            </h3>
+                            <button onclick="this.closest('div').parentElement.remove()" style="background: #ff5555; border: none; color: white; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div style="color: #fff; line-height: 1.6;">
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-info-circle"></i> معلومات التذكرة</h4>
+                                <div><strong>الموضوع:</strong> ${ticket.subject}</div>
+                                <div><strong>الحالة:</strong> <span class="ticket-status status-${ticket.status}">${this.getStatusText(ticket.status)}</span></div>
+                                <div><strong>نوع المشكلة:</strong> ${this.getCategoryText(ticket.category)}</div>
+                                <div><strong>تاريخ الإنشاء:</strong> ${this.formatDate(ticket.createdAt)}</div>
+                                <div><strong>آخر تحديث:</strong> ${this.formatDate(ticket.updatedAt)}</div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-user"></i> معلومات العميل</h4>
+                                <div><strong>الاسم:</strong> ${ticket.customerName}</div>
+                                <div><strong>البريد:</strong> ${ticket.customerEmail}</div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-comment-alt"></i> وصف المشكلة</h4>
+                                <div style="white-space: pre-wrap; background: #23272a; padding: 1rem; border-radius: 6px; border-right: 4px solid #5865f2;">${ticket.description}</div>
+                            </div>
+
+                            ${ticket.attachments && ticket.attachments.length > 0 ? `
+                                <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                    <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-images"></i> الصور المرفقة (${ticket.attachments.length})</h4>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; background: #23272a; padding: 1rem; border-radius: 6px; border-right: 4px solid #57f287;">
+                                        ${ticket.attachments.map(attachment => `
+                                            <div style="position: relative; cursor: pointer;" onclick="adminSystem.viewImage('${attachment.data}', '${attachment.name}')">
+                                                <img src="${attachment.data}" alt="${attachment.name}"
+                                                     style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid #36393f; transition: all 0.2s ease;">
+                                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: white; padding: 0.2rem; font-size: 0.7rem; border-radius: 0 0 6px 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    ${attachment.name}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${ticket.responses && ticket.responses.length > 0 ? `
+                                <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                    <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-reply"></i> الردود</h4>
+                                    ${ticket.responses.map(response => `
+                                        <div style="background: #23272a; padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem; border-right: 4px solid #57f287;">
+                                            <div style="font-size: 0.9rem; color: #b9bbbe; margin-bottom: 0.5rem;">
+                                                <strong>${response.author}</strong> - ${this.formatDate(response.createdAt)}
+                                            </div>
+                                            <div style="white-space: pre-wrap;">${response.message}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+
+                            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap;">
+                                ${ticket.status !== 'closed' ? `
+                                    <button onclick="adminSystem.replyToTicket('${ticket.id}'); this.closest('div').parentElement.remove();" style="background: #5865f2; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer;">
+                                        <i class="fas fa-reply"></i> رد على التذكرة
+                                    </button>
+                                    <button onclick="adminSystem.closeTicket('${ticket.id}'); this.closest('div').parentElement.remove();" style="background: #ff5555; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer;">
+                                        <i class="fas fa-times"></i> إغلاق التذكرة
+                                    </button>
+                                ` : `
+                                    <button onclick="adminSystem.reopenTicket('${ticket.id}'); this.closest('div').parentElement.remove();" style="background: #57f287; color: black; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer;">
+                                        <i class="fas fa-undo"></i> إعادة فتح التذكرة
+                                    </button>
+                                `}
+                                <button onclick="adminSystem.deleteTicket('${ticket.id}'); this.closest('div').parentElement.remove();" style="background: #dc3545; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer;">
+                                    <i class="fas fa-trash"></i> حذف التذكرة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            }
+
+            replyToTicket(ticketId) {
+                const replyText = prompt('اكتب ردك على التذكرة:');
+                if (!replyText || !replyText.trim()) return;
+
+                const response = {
+                    author: 'فريق الدعم',
+                    message: replyText.trim(),
+                    isAdmin: true
+                };
+
+                const result = this.db.addResponse(ticketId, response);
+                if (result) {
+                    this.loadTickets();
+                    this.renderStats();
+                    this.renderTickets();
+                    alert('تم إرسال الرد بنجاح!');
+                } else {
+                    alert('حدث خطأ أثناء إرسال الرد.');
+                }
+            }
+
+            closeTicket(ticketId) {
+                if (!confirm('هل أنت متأكد من إغلاق هذه التذكرة؟')) return;
+
+                const result = this.db.updateTicketStatus(ticketId, 'closed');
+                if (result) {
+                    this.loadTickets();
+                    this.renderStats();
+                    this.renderTickets();
+                    alert('تم إغلاق التذكرة بنجاح!');
+                } else {
+                    alert('حدث خطأ أثناء إغلاق التذكرة.');
+                }
+            }
+
+            reopenTicket(ticketId) {
+                if (!confirm('هل أنت متأكد من إعادة فتح هذه التذكرة؟')) return;
+
+                const result = this.db.updateTicketStatus(ticketId, 'open');
+                if (result) {
+                    this.loadTickets();
+                    this.renderStats();
+                    this.renderTickets();
+                    alert('تم إعادة فتح التذكرة بنجاح!');
+                } else {
+                    alert('حدث خطأ أثناء إعادة فتح التذكرة.');
+                }
+            }
+
+            deleteTicket(ticketId) {
+                const ticket = this.tickets.find(t => t.id === ticketId);
+                if (!ticket) return;
+
+                if (!confirm(`هل أنت متأكد من حذف التذكرة #${ticketId}؟\n\nالموضوع: ${ticket.subject}\nالعميل: ${ticket.customerName}\n\nهذا الإجراء لا يمكن التراجع عنه!`)) return;
+
+                if (!confirm('تأكيد أخير: سيتم حذف التذكرة وجميع الردود المرتبطة بها نهائياً!')) return;
+
+                const result = this.db.deleteTicket(ticketId);
+                if (result) {
+                    this.loadTickets();
+                    this.renderStats();
+                    this.renderTickets();
+                    alert('تم حذف التذكرة بنجاح!');
+                } else {
+                    alert('حدث خطأ أثناء حذف التذكرة.');
+                }
+            }
+
+            viewImage(imageSrc, imageName) {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                    background: rgba(0,0,0,0.9); z-index: 10000; display: flex;
+                    align-items: center; justify-content: center; padding: 1rem;
+                `;
+
+                modal.innerHTML = `
+                    <div style="position: relative; max-width: 90vw; max-height: 90vh;">
+                        <button onclick="this.closest('div').parentElement.remove()"
+                                style="position: absolute; top: -40px; right: 0; background: #ff5555; border: none; color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 1.2rem; z-index: 10001;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <img src="${imageSrc}" alt="${imageName}"
+                             style="max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+                        <div style="position: absolute; bottom: -40px; left: 0; right: 0; color: white; text-align: center; font-size: 0.9rem; background: rgba(0,0,0,0.7); padding: 0.5rem; border-radius: 6px;">
+                            ${imageName}
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+
+                // إغلاق بمفتاح Escape
+                const handleEscape = (e) => {
+                    if (e.key === 'Escape') {
+                        modal.remove();
+                        document.removeEventListener('keydown', handleEscape);
+                    }
+                };
+                document.addEventListener('keydown', handleEscape);
+            }
+
+
+        }
+
+        // الوظائف العامة
+        function refreshTickets() {
+            adminSystem.loadTickets();
+            adminSystem.renderStats();
+            adminSystem.renderTickets();
+            alert('تم تحديث التذاكر!');
+        }
+
+        function clearAllTickets() {
+            if (confirm('هل أنت متأكد من حذف جميع التذاكر؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+                if (confirm('تأكيد أخير: سيتم حذف جميع التذاكر والردود والإشعارات!')) {
+                    adminSystem.db.clearAllData();
+                    adminSystem.loadTickets();
+                    adminSystem.renderStats();
+                    adminSystem.renderTickets();
+                    alert('تم حذف جميع التذاكر بنجاح!');
+                }
+            }
+        }
+
+        function logout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                localStorage.removeItem('support_admin_logged_in');
+                localStorage.removeItem('support_admin_login_time');
+
+                document.getElementById('login-form').reset();
+                adminSystem.hideError();
+                adminSystem.showLoginForm();
+            }
+        }
+
+        // تشغيل النظام
+        let adminSystem;
+        document.addEventListener('DOMContentLoaded', () => {
+            adminSystem = new SupportAdminSystem();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تذاكر الدعم الفني - München Store</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .support-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+            min-height: calc(100vh - 4rem);
+        }
+
+        .support-header {
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(88, 101, 242, 0.3);
+        }
+
+        .support-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2.2rem;
+            font-weight: bold;
+        }
+
+        .support-header p {
+            margin: 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .tickets-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .new-ticket-section {
+            background: #23272a;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(88, 101, 242, 0.2);
+        }
+
+        .tickets-list-section {
+            background: #23272a;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(87, 242, 135, 0.2);
+        }
+
+        .section-title {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 0 0 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #36393f;
+            border-radius: 8px;
+            background: #2c2f33;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #5865f2;
+            box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group input[type="file"] {
+            border: 2px dashed #36393f !important;
+            background: #2c2f33 !important;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .form-group input[type="file"]:hover {
+            border-color: #57f287 !important;
+            background: #23272a !important;
+        }
+
+        .form-group input[type="file"]:focus {
+            border-color: #5865f2 !important;
+            box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.1);
+        }
+
+        .attachment-preview {
+            position: relative;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+
+        .attachment-preview img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #36393f;
+            transition: all 0.2s ease;
+        }
+
+        .attachment-preview:hover img {
+            border-color: #57f287;
+            transform: scale(1.05);
+        }
+
+        .attachment-remove {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff5555;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .attachment-remove:hover {
+            background: #ff3333;
+            transform: scale(1.1);
+        }
+
+        .attachment-info {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            font-size: 0.7rem;
+            color: #b9bbbe;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .priority-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: left 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-left: 2.5rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #5865f2 0%, #57f287 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 6px 20px rgba(88, 101, 242, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(88, 101, 242, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ticket-item {
+            background: #2c2f33;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #36393f;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ticket-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(87, 242, 135, 0.1);
+            border-color: rgba(87, 242, 135, 0.3);
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .ticket-id {
+            color: #5865f2;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .ticket-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-open {
+            background: rgba(87, 242, 135, 0.2);
+            color: #57f287;
+        }
+
+        .status-pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+
+        .status-closed {
+            background: rgba(255, 85, 85, 0.2);
+            color: #ff5555;
+        }
+
+        .ticket-title {
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .ticket-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #b9bbbe;
+        }
+
+        .priority-high {
+            color: #ff5555;
+        }
+
+        .priority-medium {
+            color: #ffa500;
+        }
+
+        .priority-low {
+            color: #57f287;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #b9bbbe;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #36393f;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            background: rgba(87, 242, 135, 0.1);
+            border: 1px solid #57f287;
+            color: #57f287;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+        }
+
+        /* تحسينات للهواتف */
+        @media (max-width: 768px) {
+            .support-container {
+                margin: 1rem;
+                padding: 0.5rem;
+            }
+
+            .tickets-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .support-header {
+                padding: 1.5rem;
+            }
+
+            .support-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .new-ticket-section,
+            .tickets-list-section {
+                padding: 1.5rem;
+            }
+
+            .ticket-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .ticket-meta {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .support-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .new-ticket-section,
+            .tickets-list-section {
+                padding: 1rem;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 0.7rem;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" style="justify-content:center;">
+        <div class="logo">
+            <i class="fas fa-code"></i>
+            <span>München Store</span>
+        </div>
+        <ul class="nav-links" style="margin:0 auto;">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">منتجاتنا <i class="fas fa-angle-down"></i></a>
+                <div class="dropdown-content">
+                    <a href="bots.html">بوتات ديسكورد</a>
+                    <a href="users.html">يوزرات ديسكورد</a>
+                    <a href="websites.html">برمجة مواقع شخصية</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="support-container">
+        <div class="support-header">
+            <h1><i class="fas fa-headset"></i> تذاكر الدعم الفني</h1>
+            <p>نحن هنا لمساعدتك! أرسل تذكرة دعم وسنرد عليك في أقرب وقت ممكن</p>
+        </div>
+
+        <!-- ملاحظات مهمة -->
+        <div style="background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%); color: #000; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 2px solid rgba(255, 193, 7, 0.3);">
+            <h3 style="margin: 0 0 1rem 0; color: #000; font-size: 1.2rem;">
+                <i class="fas fa-exclamation-triangle"></i> ملاحظات مهمة قبل إرسال التذكرة
+            </h3>
+            <div style="background: rgba(0, 0, 0, 0.1); padding: 1rem; border-radius: 8px; line-height: 1.8;">
+                <div style="margin-bottom: 0.8rem;">
+                    <strong>1.</strong> <strong>اكتب مشكلتك كاملة في رسالة واحدة</strong> - وضح جميع التفاصيل والخطوات التي قمت بها
+                </div>
+                <div style="margin-bottom: 0.8rem;">
+                    <strong>2.</strong> <strong>لا تعمل إعادة تحميل للصفحة</strong> بعد إرسال التذكرة - فقط اضغط على زر "تحديث" لرؤية الرد
+                </div>
+                <div style="margin-bottom: 0.8rem;">
+                    <strong>3.</strong> <strong>انتظر الرد قبل إرسال تذكرة جديدة</strong> - تجنب إرسال تذاكر متعددة لنفس المشكلة
+                </div>
+                <div style="margin-bottom: 0.8rem;">
+                    <strong>4.</strong> <strong>اذكر نوع المشكله</strong> - (استفسار عن المنتج، الفواتير والدفع، مشكلة تقنيه ،إلخ..) لتسريع المساعدة
+                </div>
+                <div>
+                    <strong>5.</strong> <strong>أرفق صور توضيحية</strong> إذا كانت المشكلة تحتاج توضيح بصري - يمكنك رفع حتى 5 صور (PNG, JPG, GIF)
+                </div>
+            </div>
+        </div>
+
+        <div class="tickets-grid">
+            <div class="new-ticket-section">
+                <h2 class="section-title">
+                    <i class="fas fa-plus-circle"></i>
+                    إنشاء تذكرة جديدة
+                </h2>
+
+                <div class="success-message" id="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    تم إرسال تذكرتك بنجاح! سنرد عليك قريباً.
+                </div>
+
+                <form id="ticket-form">
+                    <div class="form-group">
+                        <label for="customer-name">
+                            <i class="fas fa-user"></i> الاسم الكامل *
+                        </label>
+                        <input type="text" id="customer-name" name="customerName" required placeholder="أدخل اسمك الكامل">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer-email">
+                            <i class="fas fa-envelope"></i> البريد الإلكتروني *
+                        </label>
+                        <input type="email" id="customer-email" name="customerEmail" required placeholder="example@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ticket-subject">
+                            <i class="fas fa-tag"></i> موضوع التذكرة *
+                        </label>
+                        <input type="text" id="ticket-subject" name="subject" required placeholder="اكتب موضوع المشكلة">
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label for="ticket-category">
+                            <i class="fas fa-folder"></i> نوع المشكلة
+                        </label>
+                        <select id="ticket-category" name="category">
+                            <option value="technical">مشكلة تقنية</option>
+                            <option value="billing">الفواتير والدفع</option>
+                            <option value="product">استفسار عن المنتج</option>
+                            <option value="account">مشكلة في الحساب</option>
+                            <option value="other">أخرى</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ticket-description">
+                            <i class="fas fa-comment-alt"></i> وصف المشكلة *
+                        </label>
+                        <textarea id="ticket-description" name="description" required placeholder="اشرح المشكلة بالتفصيل..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ticket-attachments">
+                            <i class="fas fa-paperclip"></i> إرفاق صور (اختياري)
+                        </label>
+                        <div style="position: relative;">
+                            <input type="file" id="ticket-attachments" name="attachments" multiple accept="image/*"
+                                   style="width: 100%; padding: 0.8rem 1rem; border: 2px dashed #36393f; border-radius: 8px; background: #2c2f33; color: #fff; font-size: 1rem; transition: border-color 0.2s; box-sizing: border-box; cursor: pointer;">
+                            <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #b9bbbe;">
+                                <i class="fas fa-info-circle"></i> يمكنك رفع عدة صور (PNG, JPG, GIF) - الحد الأقصى 5MB لكل صورة
+                            </div>
+                        </div>
+                        <div id="attachments-preview" style="margin-top: 1rem; display: none;">
+                            <div style="color: #57f287; font-weight: bold; margin-bottom: 0.5rem;">
+                                <i class="fas fa-images"></i> الصور المرفقة:
+                            </div>
+                            <div id="preview-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submit-btn">
+                        <i class="fas fa-paper-plane"></i> إرسال التذكرة
+                    </button>
+
+                    <!-- تذكير سريع -->
+                    <div style="background: rgba(87, 242, 135, 0.1); border: 1px solid #57f287; color: #57f287; padding: 0.8rem; border-radius: 8px; margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>تذكير:</strong> بعد الإرسال، اضغط على زر "تحديث" في قسم "تذاكرك السابقة" لرؤية الرد - لا تعمل إعادة تحميل للصفحة
+                    </div>
+                </form>
+            </div>
+
+            <div class="tickets-list-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="section-title" style="margin: 0;">
+                        <i class="fas fa-list"></i>
+                        تذاكرك السابقة
+                    </h2>
+                    <button onclick="refreshTicketsList()" style="background: #5865f2; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">
+                        <i class="fas fa-sync-alt"></i> تحديث
+                    </button>
+                </div>
+
+                <!-- ملاحظة التحديث -->
+                <div style="background: rgba(88, 101, 242, 0.1); border: 1px solid #5865f2; color: #5865f2; padding: 0.8rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-size: 0.85rem;">
+                    <i class="fas fa-sync-alt"></i>
+                    <strong>للحصول على آخر الردود:</strong> اضغط على زر "تحديث" أعلاه - لا تعمل إعادة تحميل للصفحة
+                </div>
+
+                <div id="tickets-list">
+                    <!-- سيتم ملؤها بـ JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background:#181c20;color:#b9bbbe;padding:2rem 1rem 1rem 1rem;text-align:center;border-top:1.5px solid #36393f;margin-top:2rem;">
+        <div style="font-size:1.15rem;margin-bottom:0.7rem;color:#fff;font-weight:bold;">München Store &copy; 2025</div>
+        <div style="margin-bottom:0.7rem;">
+            <a href="privacy.html" style="color:#57f287;text-decoration:underline;font-size:1.05rem;">سياسة الخصوصية</a> |
+            <a href="support-tickets.html" style="color:#5865f2;text-decoration:underline;font-size:1.05rem;">الدعم الفني</a> |
+            <a href="mailto:info@munchenstore.com" style="color:#5865f2;text-decoration:underline;font-size:1.05rem;">تواصل معنا</a>
+        </div>
+        <div id="privacy" style="max-width:700px;margin:1.2rem auto 0 auto;font-size:0.98rem;background:#23272a;padding:1.1rem 0.7rem;border-radius:10px;">
+            <b style="color:#fff;">سياسة الخصوصية:</b><br>
+            نحن نحترم خصوصيتك ولا نشارك بياناتك مع أي طرف ثالث. جميع عمليات الدفع مؤمنة عبر PayPal، ولا يتم تخزين أي بيانات حساسة على الموقع.
+        </div>
+    </footer>
+
+    <script src="support-chat.js"></script>
+    <script src="support-tickets-db.js"></script>
+    <script>
+        // نظام إدارة تذاكر الدعم الفني
+        class SupportTicketSystem {
+            constructor() {
+                this.db = window.supportTicketsDB;
+                this.init();
+            }
+
+            init() {
+                this.setupForm();
+                this.setupFileUpload();
+                this.renderTickets();
+            }
+
+            setupForm() {
+                const form = document.getElementById('ticket-form');
+                const submitBtn = document.getElementById('submit-btn');
+
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.submitTicket(form, submitBtn);
+                });
+            }
+
+            setupFileUpload() {
+                const fileInput = document.getElementById('ticket-attachments');
+                const previewContainer = document.getElementById('preview-container');
+                const previewSection = document.getElementById('attachments-preview');
+
+                this.attachedFiles = [];
+
+                fileInput.addEventListener('change', (e) => {
+                    const files = Array.from(e.target.files);
+
+                    files.forEach(file => {
+                        if (this.validateFile(file)) {
+                            this.addFileToPreview(file);
+                        }
+                    });
+
+                    // مسح input لإمكانية رفع نفس الملف مرة أخرى
+                    fileInput.value = '';
+                });
+            }
+
+            validateFile(file) {
+                // التحقق من نوع الملف
+                if (!file.type.startsWith('image/')) {
+                    alert('يمكن رفع الصور فقط (PNG, JPG, GIF)');
+                    return false;
+                }
+
+                // التحقق من حجم الملف (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('حجم الصورة يجب أن يكون أقل من 5MB');
+                    return false;
+                }
+
+                // التحقق من عدد الملفات (حد أقصى 5 صور)
+                if (this.attachedFiles.length >= 5) {
+                    alert('يمكن رفع 5 صور كحد أقصى');
+                    return false;
+                }
+
+                return true;
+            }
+
+            addFileToPreview(file) {
+                const previewContainer = document.getElementById('preview-container');
+                const previewSection = document.getElementById('attachments-preview');
+
+                // إضافة الملف للقائمة
+                this.attachedFiles.push(file);
+
+                // إنشاء معاينة الصورة
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'attachment-preview';
+                    previewDiv.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <button type="button" class="attachment-remove" onclick="ticketSystem.removeAttachment(${this.attachedFiles.length - 1})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="attachment-info">${file.name}</div>
+                    `;
+
+                    previewContainer.appendChild(previewDiv);
+                };
+                reader.readAsDataURL(file);
+
+                // إظهار قسم المعاينة
+                previewSection.style.display = 'block';
+            }
+
+            removeAttachment(index) {
+                // إزالة الملف من القائمة
+                this.attachedFiles.splice(index, 1);
+
+                // إعادة بناء المعاينة
+                this.rebuildPreview();
+            }
+
+            rebuildPreview() {
+                const previewContainer = document.getElementById('preview-container');
+                const previewSection = document.getElementById('attachments-preview');
+
+                // مسح المعاينة الحالية
+                previewContainer.innerHTML = '';
+
+                if (this.attachedFiles.length === 0) {
+                    previewSection.style.display = 'none';
+                    return;
+                }
+
+                // إعادة بناء المعاينة
+                this.attachedFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const previewDiv = document.createElement('div');
+                        previewDiv.className = 'attachment-preview';
+                        previewDiv.innerHTML = `
+                            <img src="${e.target.result}" alt="${file.name}">
+                            <button type="button" class="attachment-remove" onclick="ticketSystem.removeAttachment(${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="attachment-info">${file.name}</div>
+                        `;
+
+                        previewContainer.appendChild(previewDiv);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            async processAttachments() {
+                const attachments = [];
+
+                for (const file of this.attachedFiles) {
+                    try {
+                        const base64 = await this.fileToBase64(file);
+                        attachments.push({
+                            name: file.name,
+                            type: file.type,
+                            size: file.size,
+                            data: base64
+                        });
+                    } catch (error) {
+                        console.error('خطأ في معالجة الصورة:', file.name, error);
+                    }
+                }
+
+                return attachments;
+            }
+
+            fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            clearAttachments() {
+                this.attachedFiles = [];
+                const previewContainer = document.getElementById('preview-container');
+                const previewSection = document.getElementById('attachments-preview');
+
+                previewContainer.innerHTML = '';
+                previewSection.style.display = 'none';
+            }
+
+            viewImage(imageSrc, imageName) {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                    background: rgba(0,0,0,0.9); z-index: 10000; display: flex;
+                    align-items: center; justify-content: center; padding: 1rem;
+                `;
+
+                modal.innerHTML = `
+                    <div style="position: relative; max-width: 90vw; max-height: 90vh;">
+                        <button onclick="this.closest('div').parentElement.remove()"
+                                style="position: absolute; top: -40px; right: 0; background: #ff5555; border: none; color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 1.2rem; z-index: 10001;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <img src="${imageSrc}" alt="${imageName}"
+                             style="max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+                        <div style="position: absolute; bottom: -40px; left: 0; right: 0; color: white; text-align: center; font-size: 0.9rem; background: rgba(0,0,0,0.7); padding: 0.5rem; border-radius: 6px;">
+                            ${imageName}
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+
+                // إغلاق بمفتاح Escape
+                const handleEscape = (e) => {
+                    if (e.key === 'Escape') {
+                        modal.remove();
+                        document.removeEventListener('keydown', handleEscape);
+                    }
+                };
+                document.addEventListener('keydown', handleEscape);
+            }
+
+            async submitTicket(form, submitBtn) {
+                // تعطيل الزر أثناء الإرسال
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+
+                // جمع بيانات النموذج
+                const formData = new FormData(form);
+
+                // تحويل الصور المرفقة إلى base64
+                const attachments = await this.processAttachments();
+
+                const ticketData = {
+                    customerName: formData.get('customerName'),
+                    customerEmail: formData.get('customerEmail'),
+                    subject: formData.get('subject'),
+                    priority: 'low', // أولوية افتراضية منخفضة
+                    category: formData.get('category'),
+                    description: formData.get('description'),
+                    attachments: attachments
+                };
+
+                // محاكاة تأخير الشبكة
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // حفظ التذكرة باستخدام قاعدة البيانات المشتركة
+                const newTicket = this.db.addTicket(ticketData);
+
+                if (newTicket) {
+                    // إظهار رسالة النجاح
+                    this.showSuccessMessage(newTicket.id);
+
+                    // إعادة تعيين النموذج
+                    form.reset();
+
+                    // مسح الصور المرفقة
+                    this.clearAttachments();
+
+                    // تحديث قائمة التذاكر
+                    this.renderTickets();
+                } else {
+                    alert('حدث خطأ أثناء إرسال التذكرة. يرجى المحاولة مرة أخرى.');
+                }
+
+                // إعادة تفعيل الزر
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال التذكرة';
+            }
+
+            generateTicketId() {
+                const timestamp = Date.now();
+                const random = Math.floor(Math.random() * 1000);
+                return `TK${timestamp}${random}`.slice(-10);
+            }
+
+            showSuccessMessage(ticketId) {
+                const successMessage = document.getElementById('success-message');
+                successMessage.innerHTML = `
+                    <i class="fas fa-check-circle"></i>
+                    تم إرسال تذكرتك بنجاح! رقم التذكرة: <strong>#${ticketId}</strong><br>
+                    سنرد عليك قريباً على البريد الإلكتروني المسجل.<br><br>
+                    <strong style="color: #ffc107;"><i class="fas fa-exclamation-triangle"></i> مهم:</strong>
+                    لرؤية الرد، اضغط على زر "تحديث" في قسم "تذاكرك السابقة" - لا تعمل إعادة تحميل للصفحة
+                `;
+                successMessage.style.display = 'block';
+
+                // إخفاء الرسالة بعد 10 ثوان
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 10000);
+
+                // تمرير لأعلى الصفحة
+                successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            renderTickets() {
+                const ticketsList = document.getElementById('tickets-list');
+                const allTickets = this.db.getTickets();
+                const deletedTickets = this.getDeletedTickets();
+
+                // فلترة التذاكر لاستثناء المحذوفة من سجل العميل
+                const tickets = allTickets.filter(ticket => !deletedTickets.includes(ticket.id));
+
+                if (tickets.length === 0) {
+                    ticketsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>لا توجد تذاكر</h3>
+                            <p>لم تقم بإنشاء أي تذاكر دعم بعد</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // عرض آخر 10 تذاكر فقط للعملاء
+                const recentTickets = tickets.slice(0, 10);
+
+                ticketsList.innerHTML = recentTickets.map(ticket => `
+                    <div class="ticket-item">
+                        <div class="ticket-header">
+                            <div class="ticket-id" onclick="ticketSystem.viewTicketDetails('${ticket.id}')" style="cursor: pointer;">#${ticket.id}</div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <div class="ticket-status status-${ticket.status}">
+                                    ${this.getStatusText(ticket.status)}
+                                </div>
+                                ${ticket.status === 'closed' ? `
+                                    <button onclick="event.stopPropagation(); ticketSystem.deleteCustomerTicket('${ticket.id}')"
+                                            style="background: #ff5555; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.8rem;"
+                                            title="حذف من السجل">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="ticket-title" onclick="ticketSystem.viewTicketDetails('${ticket.id}')" style="cursor: pointer;">${ticket.subject}</div>
+                        <div class="ticket-meta">
+                            <span><i class="fas fa-user"></i> ${ticket.customerName}</span>
+                            <span><i class="fas fa-calendar"></i> ${this.formatDate(ticket.createdAt)}</span>
+                            ${ticket.responses && ticket.responses.length > 0 ?
+                                `<span style="color: #57f287;"><i class="fas fa-reply"></i> ${ticket.responses.length} رد</span>` :
+                                ''
+                            }
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            getStatusText(status) {
+                const statusMap = {
+                    'open': 'مفتوحة',
+                    'pending': 'قيد المراجعة',
+                    'closed': 'مغلقة'
+                };
+                return statusMap[status] || status;
+            }
+
+            getPriorityText(priority) {
+                const priorityMap = {
+                    'low': 'منخفضة',
+                    'medium': 'متوسطة',
+                    'high': 'عالية'
+                };
+                return priorityMap[priority] || priority;
+            }
+
+            getCategoryText(category) {
+                const categoryMap = {
+                    'technical': 'مشكلة تقنية',
+                    'billing': 'الفواتير والدفع',
+                    'product': 'استفسار عن المنتج',
+                    'account': 'مشكلة في الحساب',
+                    'other': 'أخرى'
+                };
+                return categoryMap[category] || category;
+            }
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('ar-SA', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            viewTicketDetails(ticketId) {
+                const tickets = this.db.getTickets();
+                const ticket = tickets.find(t => t.id === ticketId);
+                if (!ticket) {
+                    alert('التذكرة غير موجودة أو تم حذفها!');
+                    return;
+                }
+
+                // إنشاء نافذة تفاصيل التذكرة
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                    background: rgba(0,0,0,0.8); z-index: 10000; display: flex;
+                    align-items: center; justify-content: center; padding: 1rem;
+                `;
+
+                modal.innerHTML = `
+                    <div style="background: #23272a; border-radius: 16px; padding: 2rem; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; border: 2px solid #5865f2;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #36393f; padding-bottom: 1rem;">
+                            <h3 style="color: #5865f2; margin: 0; font-size: 1.3rem;">
+                                <i class="fas fa-ticket-alt"></i> تذكرة #${ticket.id}
+                            </h3>
+                            <button onclick="this.closest('div').parentElement.remove()" style="background: #ff5555; border: none; color: white; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div style="color: #fff; line-height: 1.6;">
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-info-circle"></i> معلومات التذكرة</h4>
+                                <div><strong>الموضوع:</strong> ${ticket.subject}</div>
+                                <div><strong>الحالة:</strong> <span class="ticket-status status-${ticket.status}">${this.getStatusText(ticket.status)}</span></div>
+                                <div><strong>نوع المشكلة:</strong> ${this.getCategoryText(ticket.category)}</div>
+                                <div><strong>تاريخ الإنشاء:</strong> ${this.formatDate(ticket.createdAt)}</div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-user"></i> معلومات العميل</h4>
+                                <div><strong>الاسم:</strong> ${ticket.customerName}</div>
+                                <div><strong>البريد:</strong> ${ticket.customerEmail}</div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-comment-alt"></i> وصف المشكلة</h4>
+                                <div style="white-space: pre-wrap; background: #23272a; padding: 1rem; border-radius: 6px; border-right: 4px solid #5865f2;">${ticket.description}</div>
+                            </div>
+
+                            ${ticket.attachments && ticket.attachments.length > 0 ? `
+                                <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                    <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-images"></i> الصور المرفقة (${ticket.attachments.length})</h4>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; background: #23272a; padding: 1rem; border-radius: 6px; border-right: 4px solid #57f287;">
+                                        ${ticket.attachments.map(attachment => `
+                                            <div style="position: relative; cursor: pointer;" onclick="ticketSystem.viewImage('${attachment.data}', '${attachment.name}')">
+                                                <img src="${attachment.data}" alt="${attachment.name}"
+                                                     style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid #36393f; transition: all 0.2s ease;">
+                                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: white; padding: 0.2rem; font-size: 0.7rem; border-radius: 0 0 6px 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    ${attachment.name}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${ticket.responses.length > 0 ? `
+                                <div style="margin-bottom: 1rem; padding: 1rem; background: #2c2f33; border-radius: 8px;">
+                                    <h4 style="color: #57f287; margin: 0 0 0.5rem 0;"><i class="fas fa-reply"></i> الردود</h4>
+                                    ${ticket.responses.map(response => `
+                                        <div style="background: #23272a; padding: 1rem; border-radius: 6px; margin-bottom: 0.5rem; border-right: 4px solid #57f287;">
+                                            <div style="font-size: 0.9rem; color: #b9bbbe; margin-bottom: 0.5rem;">
+                                                <strong>${response.author}</strong> - ${this.formatDate(response.createdAt)}
+                                            </div>
+                                            <div style="white-space: pre-wrap;">${response.message}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                // إغلاق عند الضغط خارج النافذة
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            }
+
+            // إضافة رد من العميل على التذكرة
+            addCustomerReply(ticketId) {
+                const replyText = prompt('اكتب ردك على التذكرة:');
+                if (!replyText || !replyText.trim()) return;
+
+                const response = {
+                    author: 'العميل',
+                    message: replyText.trim(),
+                    isAdmin: false
+                };
+
+                const result = this.db.addResponse(ticketId, response);
+                if (result) {
+                    alert('تم إرسال ردك بنجاح!');
+                    this.renderTickets();
+                } else {
+                    alert('حدث خطأ أثناء إرسال الرد.');
+                }
+            }
+
+            // حذف التذكرة من سجل العميل (للتذاكر المغلقة فقط)
+            deleteCustomerTicket(ticketId) {
+                const tickets = this.db.getTickets();
+                const ticket = tickets.find(t => t.id === ticketId);
+
+                if (!ticket) {
+                    alert('التذكرة غير موجودة!');
+                    return;
+                }
+
+                if (ticket.status !== 'closed') {
+                    alert('يمكن حذف التذاكر المغلقة فقط من السجل!');
+                    return;
+                }
+
+                if (!confirm(`هل تريد حذف التذكرة #${ticketId} من سجلك؟\n\nالموضوع: ${ticket.subject}\n\nملاحظة: هذا سيحذف التذكرة من سجلك الشخصي فقط.`)) {
+                    return;
+                }
+
+                // إضافة التذكرة لقائمة المحذوفة للعميل
+                this.addToDeletedTickets(ticketId);
+
+                // تحديث العرض
+                this.renderTickets();
+
+                alert('تم حذف التذكرة من سجلك بنجاح!');
+            }
+
+            // إضافة التذكرة لقائمة المحذوفة
+            addToDeletedTickets(ticketId) {
+                try {
+                    const deletedTickets = this.getDeletedTickets();
+                    if (!deletedTickets.includes(ticketId)) {
+                        deletedTickets.push(ticketId);
+                        localStorage.setItem('customer_deleted_tickets', JSON.stringify(deletedTickets));
+                    }
+                } catch (error) {
+                    console.error('خطأ في حفظ قائمة التذاكر المحذوفة:', error);
+                }
+            }
+
+            // الحصول على قائمة التذاكر المحذوفة
+            getDeletedTickets() {
+                try {
+                    const deleted = localStorage.getItem('customer_deleted_tickets');
+                    return deleted ? JSON.parse(deleted) : [];
+                } catch (error) {
+                    console.error('خطأ في تحميل قائمة التذاكر المحذوفة:', error);
+                    return [];
+                }
+            }
+
+            // عرض التذاكر المحذوفة
+            showDeletedTickets() {
+                const deletedTicketIds = this.getDeletedTickets();
+
+                if (deletedTicketIds.length === 0) {
+                    alert('لا توجد تذاكر محذوفة في سجلك.');
+                    return;
+                }
+
+                const allTickets = this.db.getTickets();
+                const deletedTickets = allTickets.filter(ticket => deletedTicketIds.includes(ticket.id));
+
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                    background: rgba(0,0,0,0.8); z-index: 10000; display: flex;
+                    align-items: center; justify-content: center; padding: 1rem;
+                `;
+
+                modal.innerHTML = `
+                    <div style="background: #23272a; border-radius: 16px; padding: 2rem; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; border: 2px solid #6c757d;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #36393f; padding-bottom: 1rem;">
+                            <h3 style="color: #6c757d; margin: 0; font-size: 1.3rem;">
+                                <i class="fas fa-trash-restore"></i> التذاكر المحذوفة (${deletedTickets.length})
+                            </h3>
+                            <button onclick="this.closest('div').parentElement.remove()" style="background: #ff5555; border: none; color: white; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div style="color: #fff;">
+                            ${deletedTickets.map(ticket => `
+                                <div style="background: #2c2f33; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; border: 1px solid #36393f;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                        <div style="color: #6c757d; font-weight: bold;">#${ticket.id}</div>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button onclick="ticketSystem.restoreTicket('${ticket.id}'); this.closest('div').parentElement.parentElement.parentElement.parentElement.remove();"
+                                                    style="background: #57f287; color: black; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+                                                <i class="fas fa-undo"></i> استعادة
+                                            </button>
+                                            <button onclick="ticketSystem.permanentDeleteTicket('${ticket.id}'); this.closest('div').parentElement.remove();"
+                                                    style="background: #dc3545; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+                                                <i class="fas fa-trash"></i> حذف نهائي
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div style="font-weight: bold; margin-bottom: 0.5rem;">${ticket.subject}</div>
+                                    <div style="font-size: 0.9rem; color: #b9bbbe;">
+                                        <span><i class="fas fa-calendar"></i> ${this.formatDate(ticket.createdAt)}</span>
+                                        <span style="margin-right: 1rem;"><i class="fas fa-flag"></i> ${this.getStatusText(ticket.status)}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #36393f;">
+                            <button onclick="ticketSystem.restoreAllTickets(); this.closest('div').parentElement.remove();"
+                                    style="background: #57f287; color: black; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; margin-left: 0.5rem;">
+                                <i class="fas fa-undo"></i> استعادة الكل
+                            </button>
+                            <button onclick="ticketSystem.clearDeletedTickets(); this.closest('div').parentElement.remove();"
+                                    style="background: #dc3545; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer;">
+                                <i class="fas fa-trash"></i> مسح الكل نهائياً
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            }
+
+            // استعادة تذكرة واحدة
+            restoreTicket(ticketId) {
+                try {
+                    const deletedTickets = this.getDeletedTickets();
+                    const updatedDeleted = deletedTickets.filter(id => id !== ticketId);
+                    localStorage.setItem('customer_deleted_tickets', JSON.stringify(updatedDeleted));
+                    this.renderTickets();
+                    alert('تم استعادة التذكرة بنجاح!');
+                } catch (error) {
+                    console.error('خطأ في استعادة التذكرة:', error);
+                    alert('حدث خطأ أثناء استعادة التذكرة.');
+                }
+            }
+
+            // استعادة جميع التذاكر
+            restoreAllTickets() {
+                if (!confirm('هل تريد استعادة جميع التذاكر المحذوفة؟')) return;
+
+                try {
+                    localStorage.removeItem('customer_deleted_tickets');
+                    this.renderTickets();
+                    alert('تم استعادة جميع التذاكر بنجاح!');
+                } catch (error) {
+                    console.error('خطأ في استعادة التذاكر:', error);
+                    alert('حدث خطأ أثناء استعادة التذاكر.');
+                }
+            }
+
+            // حذف نهائي لتذكرة واحدة من السجل
+            permanentDeleteTicket(ticketId) {
+                if (!confirm('هل تريد حذف هذه التذكرة نهائياً من سجلك؟\nلن تتمكن من استعادتها مرة أخرى!')) return;
+
+                // هذا لا يحذف التذكرة من النظام، فقط من قائمة المحذوفة
+                alert('تم حذف التذكرة نهائياً من سجلك.');
+            }
+
+            // مسح جميع التذاكر المحذوفة
+            clearDeletedTickets() {
+                if (!confirm('هل تريد مسح جميع التذاكر المحذوفة نهائياً؟\nلن تتمكن من استعادتها مرة أخرى!')) return;
+
+                try {
+                    localStorage.removeItem('customer_deleted_tickets');
+                    alert('تم مسح جميع التذاكر المحذوفة نهائياً!');
+                } catch (error) {
+                    console.error('خطأ في مسح التذاكر المحذوفة:', error);
+                    alert('حدث خطأ أثناء مسح التذاكر.');
+                }
+            }
+        }
+
+        // وظائف عامة
+        function refreshTicketsList() {
+            ticketSystem.renderTickets();
+            alert('تم تحديث قائمة التذاكر!');
+        }
+
+        // تشغيل النظام عند تحميل الصفحة
+        let ticketSystem;
+        document.addEventListener('DOMContentLoaded', () => {
+            ticketSystem = new SupportTicketSystem();
+        });
+    </script>
+</body>
+</html>
