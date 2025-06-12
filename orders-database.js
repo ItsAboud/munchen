@@ -2,7 +2,6 @@
 class OrdersDatabase {
     constructor() {
         this.storageKey = 'munchen-orders-db';
-        this.syncUrl = 'orders-data.json'; // ملف JSON للمزامنة
         this.lastSyncTime = 0;
         this.init();
     }
@@ -27,22 +26,21 @@ class OrdersDatabase {
             this.saveDatabase(initialDB);
         }
 
-        // محاولة تحميل البيانات من الخادم أولاً
-        await this.syncFromServer();
-
-        // بدء المزامنة التلقائية كل 10 ثوان
+        // بدء المزامنة التلقائية كل 5 ثوان
         setInterval(() => {
-            this.syncFromServer();
-        }, 10000);
-
-        // مزامنة عند إغلاق/تحديث الصفحة
-        window.addEventListener('beforeunload', () => {
-            this.syncToServer();
-        });
+            this.syncData();
+        }, 5000);
 
         // مزامنة عند العودة للصفحة (focus)
         window.addEventListener('focus', () => {
-            this.syncFromServer();
+            this.syncData();
+        });
+
+        // مزامنة عند تغيير localStorage في تبويب آخر
+        window.addEventListener('storage', (e) => {
+            if (e.key === this.storageKey + '_shared') {
+                this.loadSharedData();
+            }
         });
     }
 
@@ -50,8 +48,8 @@ class OrdersDatabase {
     saveDatabase(data) {
         localStorage.setItem(this.storageKey, JSON.stringify(data));
 
-        // مزامنة مع الخادم
-        this.syncToServer();
+        // حفظ في التخزين المشترك للمزامنة
+        this.saveSharedData(data);
     }
 
     // تحميل قاعدة البيانات
@@ -278,62 +276,93 @@ class OrdersDatabase {
         };
     }
 
-    // مزامنة البيانات من الخادم
-    async syncFromServer() {
+    // مزامنة البيانات المحلية
+    syncData() {
         this.updateSyncStatus('syncing');
 
         try {
-            const response = await fetch(this.syncUrl + '?t=' + Date.now());
-            if (response.ok) {
-                const serverData = await response.json();
-                if (serverData && serverData.orders) {
-                    // دمج البيانات المحلية مع بيانات الخادم
-                    const localData = this.loadDatabase();
-                    const mergedData = this.mergeData(localData, serverData);
+            const sharedData = this.getSharedData();
+            const localData = this.loadDatabase();
 
-                    // حفظ البيانات المدموجة محلياً (بدون مزامنة لتجنب التكرار)
+            if (sharedData && sharedData.orders) {
+                const mergedData = this.mergeData(localData, sharedData);
+
+                // تحديث البيانات المحلية إذا كان هناك تغيير
+                if (JSON.stringify(mergedData) !== JSON.stringify(localData)) {
                     localStorage.setItem(this.storageKey, JSON.stringify(mergedData));
-
                     this.updateSyncStatus('success');
-                    console.log('تم تحديث البيانات من الخادم');
+
+                    // إشعار التطبيق بالتحديث
+                    if (window.loadData) {
+                        window.loadData();
+                    }
+
+                    console.log('تم تحديث الطلبات من جهاز آخر');
                 } else {
                     this.updateSyncStatus('idle');
                 }
             } else {
-                this.updateSyncStatus('error');
+                this.updateSyncStatus('idle');
             }
         } catch (error) {
             this.updateSyncStatus('error');
-            console.log('تعذر الاتصال بالخادم، استخدام البيانات المحلية');
+            console.log('خطأ في مزامنة البيانات المحلية');
         }
     }
 
-    // مزامنة البيانات إلى الخادم
-    async syncToServer() {
+    // حفظ البيانات في التخزين المشترك
+    saveSharedData(data) {
         try {
-            const data = this.loadDatabase();
-            const dataToSync = {
+            const sharedData = {
                 ...data,
-                lastUpdate: new Date().toISOString()
+                lastUpdate: new Date().toISOString(),
+                deviceId: this.getDeviceId()
             };
-
-            // في بيئة الإنتاج، يجب إرسال البيانات إلى API
-            // هنا سنحفظ في ملف JSON محلي للتطوير
-            console.log('مزامنة بيانات الطلبات:', dataToSync);
-
-            // محاكاة إرسال البيانات للخادم
-            // في الواقع، ستحتاج لـ API endpoint
-            /*
-            await fetch('/api/sync-orders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dataToSync)
-            });
-            */
-
+            localStorage.setItem(this.storageKey + '_shared', JSON.stringify(sharedData));
         } catch (error) {
-            console.error('خطأ في مزامنة بيانات الطلبات:', error);
+            console.error('خطأ في حفظ البيانات المشتركة:', error);
         }
+    }
+
+    // تحميل البيانات من التخزين المشترك
+    getSharedData() {
+        try {
+            const data = localStorage.getItem(this.storageKey + '_shared');
+            return data ? JSON.parse(data) : null;
+        } catch (error) {
+            console.error('خطأ في تحميل البيانات المشتركة:', error);
+            return null;
+        }
+    }
+
+    // تحميل البيانات المشتركة عند تغييرها
+    loadSharedData() {
+        try {
+            const sharedData = this.getSharedData();
+            if (sharedData && sharedData.orders) {
+                const localData = this.loadDatabase();
+                const mergedData = this.mergeData(localData, sharedData);
+
+                localStorage.setItem(this.storageKey, JSON.stringify(mergedData));
+
+                // إشعار التطبيق بالتحديث
+                if (window.loadData) {
+                    window.loadData();
+                }
+            }
+        } catch (error) {
+            console.error('خطأ في تحميل البيانات المشتركة:', error);
+        }
+    }
+
+    // الحصول على معرف الجهاز
+    getDeviceId() {
+        let deviceId = localStorage.getItem('device_id');
+        if (!deviceId) {
+            deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('device_id', deviceId);
+        }
+        return deviceId;
     }
 
     // دمج البيانات المحلية مع بيانات الخادم

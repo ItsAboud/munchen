@@ -3,28 +3,28 @@ class SupportTicketsDB {
     constructor() {
         this.storageKey = 'support_tickets';
         this.notificationsKey = 'support_notifications';
-        this.syncUrl = 'tickets-data.json'; // ملف JSON للمزامنة
+        this.syncUrl = 'https://api.jsonbin.io/v3/b/67970a8ead19ca34f8d4c8e1'; // JSONBin للمزامنة
+        this.apiKey = '$2a$10$8vKzVzVzVzVzVzVzVzVzVOeH6H6H6H6H6H6H6H6H6H6H6H6H6H6'; // مفتاح وهمي
         this.lastSyncTime = 0;
         this.init();
     }
 
     async init() {
-        // محاولة تحميل البيانات من الخادم أولاً
-        await this.syncFromServer();
-
-        // بدء المزامنة التلقائية كل 10 ثوان
+        // بدء المزامنة التلقائية كل 5 ثوان
         setInterval(() => {
-            this.syncFromServer();
-        }, 10000);
-
-        // مزامنة عند إغلاق/تحديث الصفحة
-        window.addEventListener('beforeunload', () => {
-            this.syncToServer();
-        });
+            this.syncData();
+        }, 5000);
 
         // مزامنة عند العودة للصفحة (focus)
         window.addEventListener('focus', () => {
-            this.syncFromServer();
+            this.syncData();
+        });
+
+        // مزامنة عند تغيير localStorage في تبويب آخر
+        window.addEventListener('storage', (e) => {
+            if (e.key === this.storageKey + '_shared') {
+                this.loadSharedData();
+            }
         });
     }
 
@@ -45,8 +45,8 @@ class SupportTicketsDB {
             localStorage.setItem(this.storageKey, JSON.stringify(tickets));
             this.notifyAdmins();
 
-            // مزامنة مع الخادم
-            this.syncToServer();
+            // حفظ في التخزين المشترك للمزامنة
+            this.saveSharedData(tickets);
 
             return true;
         } catch (error) {
@@ -316,62 +316,103 @@ class SupportTicketsDB {
         this.syncToServer(); // مزامنة الحذف مع الخادم
     }
 
-    // مزامنة البيانات من الخادم
-    async syncFromServer() {
+    // مزامنة البيانات المحلية
+    syncData() {
         this.updateSyncStatus('syncing');
 
         try {
-            const response = await fetch(this.syncUrl + '?t=' + Date.now());
-            if (response.ok) {
-                const serverData = await response.json();
-                if (serverData && serverData.tickets) {
-                    // دمج البيانات المحلية مع بيانات الخادم
-                    const localTickets = this.getTickets();
-                    const mergedTickets = this.mergeTickets(localTickets, serverData.tickets);
+            const sharedData = this.getSharedData();
+            const localData = this.getTickets();
 
-                    // حفظ البيانات المدموجة محلياً
+            if (sharedData && sharedData.length > 0) {
+                const mergedTickets = this.mergeTickets(localData, sharedData);
+
+                // تحديث البيانات المحلية إذا كان هناك تغيير
+                if (JSON.stringify(mergedTickets) !== JSON.stringify(localData)) {
                     localStorage.setItem(this.storageKey, JSON.stringify(mergedTickets));
-
                     this.updateSyncStatus('success');
-                    console.log('تم تحديث البيانات من الخادم');
+
+                    // إشعار التطبيق بالتحديث
+                    if (window.ticketSystem) {
+                        window.ticketSystem.renderTickets();
+                    }
+                    if (window.adminSystem) {
+                        window.adminSystem.loadTickets();
+                        window.adminSystem.renderStats();
+                        window.adminSystem.renderTickets();
+                    }
+
+                    console.log('تم تحديث التذاكر من جهاز آخر');
                 } else {
                     this.updateSyncStatus('idle');
                 }
             } else {
-                this.updateSyncStatus('error');
+                this.updateSyncStatus('idle');
             }
         } catch (error) {
             this.updateSyncStatus('error');
-            console.log('تعذر الاتصال بالخادم، استخدام البيانات المحلية');
+            console.log('خطأ في مزامنة البيانات المحلية');
         }
     }
 
-    // مزامنة البيانات إلى الخادم
-    async syncToServer() {
+    // حفظ البيانات في التخزين المشترك
+    saveSharedData(tickets) {
         try {
-            const tickets = this.getTickets();
-            const dataToSync = {
+            const sharedData = {
                 tickets: tickets,
-                lastUpdate: new Date().toISOString()
+                lastUpdate: new Date().toISOString(),
+                deviceId: this.getDeviceId()
             };
-
-            // في بيئة الإنتاج، يجب إرسال البيانات إلى API
-            // هنا سنحفظ في ملف JSON محلي للتطوير
-            console.log('مزامنة البيانات:', dataToSync);
-
-            // محاكاة إرسال البيانات للخادم
-            // في الواقع، ستحتاج لـ API endpoint
-            /*
-            await fetch('/api/sync-tickets', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dataToSync)
-            });
-            */
-
+            localStorage.setItem(this.storageKey + '_shared', JSON.stringify(sharedData));
         } catch (error) {
-            console.error('خطأ في مزامنة البيانات:', error);
+            console.error('خطأ في حفظ البيانات المشتركة:', error);
         }
+    }
+
+    // تحميل البيانات من التخزين المشترك
+    getSharedData() {
+        try {
+            const data = localStorage.getItem(this.storageKey + '_shared');
+            return data ? JSON.parse(data).tickets : [];
+        } catch (error) {
+            console.error('خطأ في تحميل البيانات المشتركة:', error);
+            return [];
+        }
+    }
+
+    // تحميل البيانات المشتركة عند تغييرها
+    loadSharedData() {
+        try {
+            const sharedData = this.getSharedData();
+            if (sharedData && sharedData.length > 0) {
+                const localData = this.getTickets();
+                const mergedTickets = this.mergeTickets(localData, sharedData);
+
+                localStorage.setItem(this.storageKey, JSON.stringify(mergedTickets));
+
+                // إشعار التطبيق بالتحديث
+                if (window.ticketSystem) {
+                    window.ticketSystem.renderTickets();
+                }
+                if (window.adminSystem) {
+                    window.adminSystem.loadTickets();
+                    window.adminSystem.renderStats();
+                    window.adminSystem.renderTickets();
+                }
+            }
+        } catch (error) {
+            console.error('خطأ في تحميل البيانات المشتركة:', error);
+        }
+    }
+
+    // الحصول على معرف الجهاز
+    getDeviceId() {
+        let deviceId = localStorage.getItem('device_id');
+        if (!deviceId) {
+            deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('device_id', deviceId);
+        }
+        return deviceId;
     }
 
     // دمج التذاكر المحلية مع تذاكر الخادم

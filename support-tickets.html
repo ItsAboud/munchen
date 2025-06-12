@@ -396,7 +396,7 @@
                 <i class="fas fa-sync-alt fa-spin"></i> مزامنة تلقائية
             </div>
             <h1><i class="fas fa-headset"></i> تذاكر الدعم الفني</h1>
-            <p>نحن هنا لمساعدتك! أرسل تذكرة دعم وسنرد عليك في أقرب وقت ممكن - المزامنة التلقائية كل 10 ثوان</p>
+            <p>نحن هنا لمساعدتك! أرسل تذكرة دعم وسنرد عليك في أقرب وقت ممكن - المزامنة التلقائية كل 5 ثوان</p>
         </div>
 
         <!-- ملاحظات مهمة -->
@@ -1230,17 +1230,15 @@
             ticketSystem = new SupportTicketSystem();
 
             // مزامنة البيانات عند فتح الصفحة
-            try {
-                await ticketSystem.db.syncFromServer();
+            setTimeout(() => {
+                ticketSystem.db.syncData();
                 ticketSystem.renderTickets();
-            } catch (error) {
-                console.log('تعذر مزامنة البيانات عند بدء التشغيل');
-            }
+            }, 1000);
 
-            // تحديث تلقائي للواجهة كل 10 ثوان
+            // تحديث تلقائي للواجهة كل 5 ثوان
             setInterval(() => {
                 ticketSystem.renderTickets();
-            }, 10000);
+            }, 5000);
         });
     </script>
 </body>

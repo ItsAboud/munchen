@@ -727,7 +727,7 @@
                 <i class="fas fa-sync-alt fa-spin"></i> مزامنة تلقائية
             </div>
             <h1><i class="fas fa-chart-bar"></i> لوحة إدارة الطلبات</h1>
-            <p>إدارة ومتابعة جميع طلبات العملاء - المزامنة التلقائية كل 10 ثوان</p>
+            <p>إدارة ومتابعة جميع طلبات العملاء - المزامنة التلقائية كل 5 ثوان</p>
             <div style="background: rgba(255, 165, 0, 0.1); border: 1px solid #ffa500; border-radius: 8px; padding: 1rem; margin-top: 1rem; font-size: 0.85rem; line-height: 1.5;">
                 <i class="fas fa-info-circle" style="color: #ffa500; margin-left: 0.5rem;"></i>
                 <strong>ملاحظة مهمة:</strong> هذا نظام تجريبي يحفظ البيانات محلياً في المتصفح.
@@ -778,12 +778,12 @@
             checkLoginStatus();
             setupLoginForm();
 
-            // بدء التحديث التلقائي للواجهة كل 10 ثوان
+            // بدء التحديث التلقائي للواجهة كل 5 ثوان
             setInterval(() => {
                 if (isLoggedIn) {
                     loadData();
                 }
-            }, 10000);
+            }, 5000);
         });
 
         function checkLoginStatus() {
@@ -856,11 +856,9 @@
             document.getElementById('admin-container').style.display = 'block';
 
             // مزامنة البيانات عند تسجيل الدخول
-            try {
-                await window.ordersDB.syncFromServer();
-            } catch (error) {
-                console.log('تعذر مزامنة البيانات عند تسجيل الدخول');
-            }
+            setTimeout(() => {
+                window.ordersDB.syncData();
+            }, 1000);
 
             // تحميل البيانات
             loadData();
@@ -1144,15 +1142,10 @@
             }
         }
         
-        async function refreshData() {
-            try {
-                await window.ordersDB.syncFromServer();
-                loadData();
-                alert('تم تحديث البيانات!');
-            } catch (error) {
-                loadData();
-                alert('تم تحديث البيانات المحلية!');
-            }
+        function refreshData() {
+            window.ordersDB.syncData();
+            loadData();
+            alert('تم تحديث البيانات!');
         }
         
         function exportData() {
