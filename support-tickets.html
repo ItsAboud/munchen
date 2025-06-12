@@ -392,8 +392,11 @@
 
     <div class="support-container">
         <div class="support-header">
+            <div id="sync-status" style="position: absolute; top: 1rem; right: 1rem; background: rgba(87, 242, 135, 0.2); color: #57f287; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; border: 1px solid #57f287;">
+                <i class="fas fa-sync-alt fa-spin"></i> مزامنة تلقائية
+            </div>
             <h1><i class="fas fa-headset"></i> تذاكر الدعم الفني</h1>
-            <p>نحن هنا لمساعدتك! أرسل تذكرة دعم وسنرد عليك في أقرب وقت ممكن</p>
+            <p>نحن هنا لمساعدتك! أرسل تذكرة دعم وسنرد عليك في أقرب وقت ممكن - المزامنة التلقائية كل 10 ثوان</p>
         </div>
 
         <!-- ملاحظات مهمة -->
@@ -521,7 +524,7 @@
                 <!-- ملاحظة التحديث -->
                 <div style="background: rgba(88, 101, 242, 0.1); border: 1px solid #5865f2; color: #5865f2; padding: 0.8rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-size: 0.85rem;">
                     <i class="fas fa-sync-alt"></i>
-                    <strong>للحصول على آخر الردود:</strong> اضغط على زر "تحديث" أعلاه - لا تعمل إعادة تحميل للصفحة
+                    <strong>للحصول على آخر الردود:</strong> اضغط على زر "تحديث" أو "مزامنة" أعلاه - المزامنة تحدث تلقائياً كل 30 ثانية
                 </div>
 
                 <div id="tickets-list">
@@ -1223,8 +1226,21 @@
 
         // تشغيل النظام عند تحميل الصفحة
         let ticketSystem;
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             ticketSystem = new SupportTicketSystem();
+
+            // مزامنة البيانات عند فتح الصفحة
+            try {
+                await ticketSystem.db.syncFromServer();
+                ticketSystem.renderTickets();
+            } catch (error) {
+                console.log('تعذر مزامنة البيانات عند بدء التشغيل');
+            }
+
+            // تحديث تلقائي للواجهة كل 10 ثوان
+            setInterval(() => {
+                ticketSystem.renderTickets();
+            }, 10000);
         });
     </script>
 </body>

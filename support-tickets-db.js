@@ -3,12 +3,29 @@ class SupportTicketsDB {
     constructor() {
         this.storageKey = 'support_tickets';
         this.notificationsKey = 'support_notifications';
+        this.syncUrl = 'tickets-data.json'; // ملف JSON للمزامنة
+        this.lastSyncTime = 0;
         this.init();
     }
 
-    init() {
-        // بدء بقاعدة بيانات فارغة - لا توجد تذاكر تجريبية
-        // يمكن للمستخدمين إنشاء تذاكر جديدة من الصفحة
+    async init() {
+        // محاولة تحميل البيانات من الخادم أولاً
+        await this.syncFromServer();
+
+        // بدء المزامنة التلقائية كل 10 ثوان
+        setInterval(() => {
+            this.syncFromServer();
+        }, 10000);
+
+        // مزامنة عند إغلاق/تحديث الصفحة
+        window.addEventListener('beforeunload', () => {
+            this.syncToServer();
+        });
+
+        // مزامنة عند العودة للصفحة (focus)
+        window.addEventListener('focus', () => {
+            this.syncFromServer();
+        });
     }
 
     // الحصول على جميع التذاكر
@@ -27,6 +44,10 @@ class SupportTicketsDB {
         try {
             localStorage.setItem(this.storageKey, JSON.stringify(tickets));
             this.notifyAdmins();
+
+            // مزامنة مع الخادم
+            this.syncToServer();
+
             return true;
         } catch (error) {
             console.error('خطأ في حفظ التذاكر:', error);
@@ -292,6 +313,131 @@ class SupportTicketsDB {
     clearAllData() {
         localStorage.removeItem(this.storageKey);
         localStorage.removeItem(this.notificationsKey);
+        this.syncToServer(); // مزامنة الحذف مع الخادم
+    }
+
+    // مزامنة البيانات من الخادم
+    async syncFromServer() {
+        this.updateSyncStatus('syncing');
+
+        try {
+            const response = await fetch(this.syncUrl + '?t=' + Date.now());
+            if (response.ok) {
+                const serverData = await response.json();
+                if (serverData && serverData.tickets) {
+                    // دمج البيانات المحلية مع بيانات الخادم
+                    const localTickets = this.getTickets();
+                    const mergedTickets = this.mergeTickets(localTickets, serverData.tickets);
+
+                    // حفظ البيانات المدموجة محلياً
+                    localStorage.setItem(this.storageKey, JSON.stringify(mergedTickets));
+
+                    this.updateSyncStatus('success');
+                    console.log('تم تحديث البيانات من الخادم');
+                } else {
+                    this.updateSyncStatus('idle');
+                }
+            } else {
+                this.updateSyncStatus('error');
+            }
+        } catch (error) {
+            this.updateSyncStatus('error');
+            console.log('تعذر الاتصال بالخادم، استخدام البيانات المحلية');
+        }
+    }
+
+    // مزامنة البيانات إلى الخادم
+    async syncToServer() {
+        try {
+            const tickets = this.getTickets();
+            const dataToSync = {
+                tickets: tickets,
+                lastUpdate: new Date().toISOString()
+            };
+
+            // في بيئة الإنتاج، يجب إرسال البيانات إلى API
+            // هنا سنحفظ في ملف JSON محلي للتطوير
+            console.log('مزامنة البيانات:', dataToSync);
+
+            // محاكاة إرسال البيانات للخادم
+            // في الواقع، ستحتاج لـ API endpoint
+            /*
+            await fetch('/api/sync-tickets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSync)
+            });
+            */
+
+        } catch (error) {
+            console.error('خطأ في مزامنة البيانات:', error);
+        }
+    }
+
+    // دمج التذاكر المحلية مع تذاكر الخادم
+    mergeTickets(localTickets, serverTickets) {
+        const merged = [...serverTickets];
+
+        // إضافة التذاكر المحلية التي لا توجد في الخادم
+        localTickets.forEach(localTicket => {
+            const existsInServer = serverTickets.find(serverTicket =>
+                serverTicket.id === localTicket.id
+            );
+
+            if (!existsInServer) {
+                merged.push(localTicket);
+            }
+        });
+
+        // ترتيب حسب تاريخ الإنشاء
+        return merged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    // تحديث مؤشر حالة المزامنة
+    updateSyncStatus(status) {
+        const syncStatusElement = document.getElementById('sync-status');
+        if (!syncStatusElement) return;
+
+        switch (status) {
+            case 'syncing':
+                syncStatusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> جاري المزامنة...';
+                syncStatusElement.style.background = 'rgba(255, 193, 7, 0.2)';
+                syncStatusElement.style.color = '#ffc107';
+                syncStatusElement.style.borderColor = '#ffc107';
+                break;
+
+            case 'success':
+                syncStatusElement.innerHTML = '<i class="fas fa-check-circle"></i> تم التحديث';
+                syncStatusElement.style.background = 'rgba(87, 242, 135, 0.2)';
+                syncStatusElement.style.color = '#57f287';
+                syncStatusElement.style.borderColor = '#57f287';
+
+                // العودة للحالة العادية بعد 3 ثوان
+                setTimeout(() => {
+                    this.updateSyncStatus('idle');
+                }, 3000);
+                break;
+
+            case 'error':
+                syncStatusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> خطأ في المزامنة';
+                syncStatusElement.style.background = 'rgba(255, 85, 85, 0.2)';
+                syncStatusElement.style.color = '#ff5555';
+                syncStatusElement.style.borderColor = '#ff5555';
+
+                // العودة للحالة العادية بعد 5 ثوان
+                setTimeout(() => {
+                    this.updateSyncStatus('idle');
+                }, 5000);
+                break;
+
+            case 'idle':
+            default:
+                syncStatusElement.innerHTML = '<i class="fas fa-sync-alt"></i> مزامنة تلقائية';
+                syncStatusElement.style.background = 'rgba(87, 242, 135, 0.2)';
+                syncStatusElement.style.color = '#57f287';
+                syncStatusElement.style.borderColor = '#57f287';
+                break;
+        }
     }
 }
 

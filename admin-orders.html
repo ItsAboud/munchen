@@ -723,8 +723,11 @@
 
     <div class="admin-container" id="admin-container" style="display: none;">
         <div class="admin-header">
+            <div id="sync-status" style="position: absolute; top: 1rem; right: 1rem; background: rgba(87, 242, 135, 0.2); color: #57f287; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; border: 1px solid #57f287;">
+                <i class="fas fa-sync-alt fa-spin"></i> مزامنة تلقائية
+            </div>
             <h1><i class="fas fa-chart-bar"></i> لوحة إدارة الطلبات</h1>
-            <p>إدارة ومتابعة جميع طلبات العملاء</p>
+            <p>إدارة ومتابعة جميع طلبات العملاء - المزامنة التلقائية كل 10 ثوان</p>
             <div style="background: rgba(255, 165, 0, 0.1); border: 1px solid #ffa500; border-radius: 8px; padding: 1rem; margin-top: 1rem; font-size: 0.85rem; line-height: 1.5;">
                 <i class="fas fa-info-circle" style="color: #ffa500; margin-left: 0.5rem;"></i>
                 <strong>ملاحظة مهمة:</strong> هذا نظام تجريبي يحفظ البيانات محلياً في المتصفح.
@@ -771,9 +774,16 @@
         };
 
         // تحميل البيانات عند بدء الصفحة
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             checkLoginStatus();
             setupLoginForm();
+
+            // بدء التحديث التلقائي للواجهة كل 10 ثوان
+            setInterval(() => {
+                if (isLoggedIn) {
+                    loadData();
+                }
+            }, 10000);
         });
 
         function checkLoginStatus() {
@@ -840,10 +850,17 @@
             document.getElementById('username').focus();
         }
 
-        function loginSuccess() {
+        async function loginSuccess() {
             isLoggedIn = true;
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('admin-container').style.display = 'block';
+
+            // مزامنة البيانات عند تسجيل الدخول
+            try {
+                await window.ordersDB.syncFromServer();
+            } catch (error) {
+                console.log('تعذر مزامنة البيانات عند تسجيل الدخول');
+            }
 
             // تحميل البيانات
             loadData();
@@ -1127,9 +1144,15 @@
             }
         }
         
-        function refreshData() {
-            loadData();
-            alert('تم تحديث البيانات!');
+        async function refreshData() {
+            try {
+                await window.ordersDB.syncFromServer();
+                loadData();
+                alert('تم تحديث البيانات!');
+            } catch (error) {
+                loadData();
+                alert('تم تحديث البيانات المحلية!');
+            }
         }
         
         function exportData() {

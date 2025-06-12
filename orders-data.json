@@ -1,0 +1,15 @@
+{
+  "orders": [],
+  "customers": [],
+  "stats": {
+    "totalOrders": 0,
+    "totalRevenue": 0,
+    "lastOrderId": 0
+  },
+  "settings": {
+    "currency": "USD",
+    "taxRate": 0,
+    "createdAt": "2025-01-27T00:00:00.000Z"
+  },
+  "lastUpdate": "2025-01-27T00:00:00.000Z"
+}

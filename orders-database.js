@@ -2,10 +2,12 @@
 class OrdersDatabase {
     constructor() {
         this.storageKey = 'munchen-orders-db';
+        this.syncUrl = 'orders-data.json'; // ملف JSON للمزامنة
+        this.lastSyncTime = 0;
         this.init();
     }
 
-    init() {
+    async init() {
         // إنشاء قاعدة البيانات إذا لم تكن موجودة
         if (!localStorage.getItem(this.storageKey)) {
             const initialDB = {
@@ -24,11 +26,32 @@ class OrdersDatabase {
             };
             this.saveDatabase(initialDB);
         }
+
+        // محاولة تحميل البيانات من الخادم أولاً
+        await this.syncFromServer();
+
+        // بدء المزامنة التلقائية كل 10 ثوان
+        setInterval(() => {
+            this.syncFromServer();
+        }, 10000);
+
+        // مزامنة عند إغلاق/تحديث الصفحة
+        window.addEventListener('beforeunload', () => {
+            this.syncToServer();
+        });
+
+        // مزامنة عند العودة للصفحة (focus)
+        window.addEventListener('focus', () => {
+            this.syncFromServer();
+        });
     }
 
     // حفظ قاعدة البيانات
     saveDatabase(data) {
         localStorage.setItem(this.storageKey, JSON.stringify(data));
+
+        // مزامنة مع الخادم
+        this.syncToServer();
     }
 
     // تحميل قاعدة البيانات
@@ -253,6 +276,149 @@ class OrdersDatabase {
             recentOrders: orders.slice(0, 10),
             topCustomers: db.customers.sort((a, b) => b.totalSpent - a.totalSpent).slice(0, 10)
         };
+    }
+
+    // مزامنة البيانات من الخادم
+    async syncFromServer() {
+        this.updateSyncStatus('syncing');
+
+        try {
+            const response = await fetch(this.syncUrl + '?t=' + Date.now());
+            if (response.ok) {
+                const serverData = await response.json();
+                if (serverData && serverData.orders) {
+                    // دمج البيانات المحلية مع بيانات الخادم
+                    const localData = this.loadDatabase();
+                    const mergedData = this.mergeData(localData, serverData);
+
+                    // حفظ البيانات المدموجة محلياً (بدون مزامنة لتجنب التكرار)
+                    localStorage.setItem(this.storageKey, JSON.stringify(mergedData));
+
+                    this.updateSyncStatus('success');
+                    console.log('تم تحديث البيانات من الخادم');
+                } else {
+                    this.updateSyncStatus('idle');
+                }
+            } else {
+                this.updateSyncStatus('error');
+            }
+        } catch (error) {
+            this.updateSyncStatus('error');
+            console.log('تعذر الاتصال بالخادم، استخدام البيانات المحلية');
+        }
+    }
+
+    // مزامنة البيانات إلى الخادم
+    async syncToServer() {
+        try {
+            const data = this.loadDatabase();
+            const dataToSync = {
+                ...data,
+                lastUpdate: new Date().toISOString()
+            };
+
+            // في بيئة الإنتاج، يجب إرسال البيانات إلى API
+            // هنا سنحفظ في ملف JSON محلي للتطوير
+            console.log('مزامنة بيانات الطلبات:', dataToSync);
+
+            // محاكاة إرسال البيانات للخادم
+            // في الواقع، ستحتاج لـ API endpoint
+            /*
+            await fetch('/api/sync-orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSync)
+            });
+            */
+
+        } catch (error) {
+            console.error('خطأ في مزامنة بيانات الطلبات:', error);
+        }
+    }
+
+    // دمج البيانات المحلية مع بيانات الخادم
+    mergeData(localData, serverData) {
+        const merged = { ...serverData };
+
+        // دمج الطلبات
+        const allOrders = [...serverData.orders];
+        localData.orders.forEach(localOrder => {
+            const existsInServer = serverData.orders.find(serverOrder =>
+                serverOrder.id === localOrder.id
+            );
+
+            if (!existsInServer) {
+                allOrders.push(localOrder);
+            }
+        });
+
+        // دمج العملاء
+        const allCustomers = [...serverData.customers];
+        localData.customers.forEach(localCustomer => {
+            const existsInServer = serverData.customers.find(serverCustomer =>
+                serverCustomer.email === localCustomer.email
+            );
+
+            if (!existsInServer) {
+                allCustomers.push(localCustomer);
+            }
+        });
+
+        // تحديث الإحصائيات
+        merged.orders = allOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+        merged.customers = allCustomers;
+        merged.stats.totalOrders = allOrders.length;
+        merged.stats.totalRevenue = allOrders.reduce((sum, order) => sum + parseFloat(order.total), 0);
+        merged.stats.lastOrderId = Math.max(...allOrders.map(o => o.id), 0);
+
+        return merged;
+    }
+
+    // تحديث مؤشر حالة المزامنة
+    updateSyncStatus(status) {
+        const syncStatusElement = document.getElementById('sync-status');
+        if (!syncStatusElement) return;
+
+        switch (status) {
+            case 'syncing':
+                syncStatusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> جاري المزامنة...';
+                syncStatusElement.style.background = 'rgba(255, 193, 7, 0.2)';
+                syncStatusElement.style.color = '#ffc107';
+                syncStatusElement.style.borderColor = '#ffc107';
+                break;
+
+            case 'success':
+                syncStatusElement.innerHTML = '<i class="fas fa-check-circle"></i> تم التحديث';
+                syncStatusElement.style.background = 'rgba(87, 242, 135, 0.2)';
+                syncStatusElement.style.color = '#57f287';
+                syncStatusElement.style.borderColor = '#57f287';
+
+                // العودة للحالة العادية بعد 3 ثوان
+                setTimeout(() => {
+                    this.updateSyncStatus('idle');
+                }, 3000);
+                break;
+
+            case 'error':
+                syncStatusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> خطأ في المزامنة';
+                syncStatusElement.style.background = 'rgba(255, 85, 85, 0.2)';
+                syncStatusElement.style.color = '#ff5555';
+                syncStatusElement.style.borderColor = '#ff5555';
+
+                // العودة للحالة العادية بعد 5 ثوان
+                setTimeout(() => {
+                    this.updateSyncStatus('idle');
+                }, 5000);
+                break;
+
+            case 'idle':
+            default:
+                syncStatusElement.innerHTML = '<i class="fas fa-sync-alt"></i> مزامنة تلقائية';
+                syncStatusElement.style.background = 'rgba(87, 242, 135, 0.2)';
+                syncStatusElement.style.color = '#57f287';
+                syncStatusElement.style.borderColor = '#57f287';
+                break;
+        }
     }
 }
 

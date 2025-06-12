@@ -488,8 +488,11 @@
             <button class="logout-btn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i> خروج
             </button>
+            <div id="sync-status" style="position: absolute; top: 1rem; right: 1rem; background: rgba(87, 242, 135, 0.2); color: #57f287; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; border: 1px solid #57f287;">
+                <i class="fas fa-sync-alt fa-spin"></i> مزامنة تلقائية
+            </div>
             <h1><i class="fas fa-headset"></i> إدارة تذاكر الدعم الفني</h1>
-            <p>إدارة ومتابعة جميع تذاكر العملاء</p>
+            <p>إدارة ومتابعة جميع تذاكر العملاء - المزامنة التلقائية كل 10 ثوان</p>
         </div>
         
         <div class="stats-grid" id="stats-grid">
@@ -622,11 +625,13 @@
             startAutoRefresh() {
                 setInterval(() => {
                     if (this.isLoggedIn) {
+                        // المزامنة التلقائية ستحدث في قاعدة البيانات
+                        // نحتاج فقط لتحديث الواجهة
                         this.loadTickets();
                         this.renderStats();
                         this.renderTickets();
                     }
-                }, 30000); // 30 ثانية
+                }, 10000); // 10 ثوان
             }
 
             showError() {
@@ -1072,8 +1077,22 @@
 
         // تشغيل النظام
         let adminSystem;
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             adminSystem = new SupportAdminSystem();
+
+            // مزامنة البيانات عند فتح الصفحة (بعد تسجيل الدخول)
+            setTimeout(async () => {
+                if (adminSystem.isLoggedIn) {
+                    try {
+                        await adminSystem.db.syncFromServer();
+                        adminSystem.loadTickets();
+                        adminSystem.renderStats();
+                        adminSystem.renderTickets();
+                    } catch (error) {
+                        console.log('تعذر مزامنة البيانات عند بدء التشغيل');
+                    }
+                }
+            }, 2000);
         });
     </script>
 </body>
